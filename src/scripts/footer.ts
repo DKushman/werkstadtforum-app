@@ -22,6 +22,7 @@ if (footer && sheet) {
     if (nextOpen !== open) {
       open = nextOpen;
       footer.inert = !nextOpen;
+      footer.classList.toggle("is-revealed", nextOpen);
     }
 
     if (reduceMotion.matches || !desktop.matches) {

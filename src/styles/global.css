@@ -52,6 +52,7 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   overflow-x: clip;
+  background: var(--beige);
 }
 
 html.lenis,

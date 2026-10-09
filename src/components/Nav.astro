@@ -558,6 +558,12 @@ const navRevealCount = mainLinks.length + subLinks.length;
       z-index: 999;
       padding: max(0.4rem, env(safe-area-inset-top, 0px)) var(--gutter) 0;
       pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        var(--beige) 0,
+        var(--beige) env(safe-area-inset-top, 0px),
+        transparent env(safe-area-inset-top, 0px)
+      );
     }
 
     .nav__shell {
