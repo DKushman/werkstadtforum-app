@@ -43,12 +43,12 @@ const sheetRest =
         </div>
       </div>
     </main>
+  </div>
 
-    <div class="scene">
-      <div class="stage" id="hero-stage">
-        <div class="stage__grow" id="hero-stage-grow">
-          <Fragment set:html={scene.base + scene.layers} />
-        </div>
+  <div class="scene">
+    <div class="stage" id="hero-stage">
+      <div class="stage__grow" id="hero-stage-grow">
+        <Fragment set:html={scene.base + scene.layers} />
       </div>
     </div>
   </div>
@@ -174,7 +174,7 @@ const sheetRest =
   }
 
   /* Szene sitzt neben main, damit sticky bis über die grüne Fläche reicht */
-  .hero__screen > .scene {
+  .hero > .scene {
     flex: 1 1 auto;
     min-height: 0;
     margin-top: auto;
@@ -379,7 +379,7 @@ const sheetRest =
       flex: 0 0 auto;
     }
 
-    .hero__screen > .scene {
+    .hero > .scene {
       flex: 1 1 auto;
       min-height: 0;
     }
@@ -463,18 +463,12 @@ const sheetRest =
       flex-direction: column;
       box-sizing: border-box;
       width: 100%;
-      /* svh = sichtbare Höhe mit geöffneter Safari-Leiste (dvh kann größer sein → Grün unten) */
-      height: 100svh;
-      height: 100dvh;
-      max-height: 100svh;
-      max-height: 100dvh;
+      /* Headline-Bereich: erste Viewport-Hälfte minus Szene (Szene ist Geschwister für sticky) */
+      height: calc(100svh - var(--scene-mobile-h) - env(safe-area-inset-bottom, 0px));
+      max-height: calc(100svh - var(--scene-mobile-h) - env(safe-area-inset-bottom, 0px));
       padding-top: calc(var(--mobile-nav) + max(0.65rem, env(safe-area-inset-top, 0px)));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-bottom: 0;
       background: transparent;
-    }
-
-    .hero__screen > .scene {
-      flex: 0 0 auto;
     }
 
     .sheet {
@@ -540,15 +534,18 @@ const sheetRest =
       margin-top: -0.08em;
     }
 
-    .scene {
+    .hero > .scene {
       --scene-grow: 1;
       --scene-scale: 1.12;
       --scene-nudge-x: clamp(0.65rem, 2.8vw, 1.1rem);
+      flex: none;
       position: sticky;
       bottom: 0;
       z-index: 4;
       width: 100%;
-      height: var(--scene-mobile-h);
+      height: calc(var(--scene-mobile-h) + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      box-sizing: border-box;
       container-type: size;
       pointer-events: none;
     }
