@@ -18,32 +18,30 @@ const sheetRest =
 <div class="hero-pin" id="hero-pin">
 <Nav />
 <div class="hero" data-hero>
-  <div class="hero__screen">
-    <main class="hero__main">
-      <div class="hero__head">
-        <div class="hero__title">
-          <h1 class="headline" id="hero-title">
-            <span class="line"><span class="line__in">Lasst</span></span>
-            <span class="line"><span class="line__in">Uns</span></span>
-            <span class="line"><span class="line__in">Berlin City West</span></span>
-            <span class="line line--rotator">
-              <span class="visually-hidden">{words.join(", ")}</span>
-              <span class="line__in rotator" aria-hidden="true">
-                <span class="rotator__track">
-                  {[...words, words[0]].map((w) => <span class="rotator__word">{w}</span>)}
-                </span>
+  <main class="hero__main">
+    <div class="hero__head">
+      <div class="hero__title">
+        <h1 class="headline" id="hero-title">
+          <span class="line"><span class="line__in">Lasst</span></span>
+          <span class="line"><span class="line__in">Uns</span></span>
+          <span class="line"><span class="line__in">Berlin City West</span></span>
+          <span class="line line--rotator">
+            <span class="visually-hidden">{words.join(", ")}</span>
+            <span class="line__in rotator" aria-hidden="true">
+              <span class="rotator__track">
+                {[...words, words[0]].map((w) => <span class="rotator__word">{w}</span>)}
               </span>
             </span>
-          </h1>
-          <p class="hero__subline">
-            <span class="hero__subline-in">
-              Das offene Forum für alle, die bei der Zukunft der City West mitreden wollen.
-            </span>
-          </p>
-        </div>
+          </span>
+        </h1>
+        <p class="hero__subline">
+          <span class="hero__subline-in">
+            Das offene Forum für alle, die bei der Zukunft der City West mitreden wollen.
+          </span>
+        </p>
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
 
   <div class="scene">
     <div class="stage" id="hero-stage">
@@ -77,10 +75,6 @@ const sheetRest =
 <style>
   .hero-pin {
     --p: 0;
-  }
-
-  .hero__screen {
-    display: contents;
   }
 
   .hero {
@@ -413,31 +407,10 @@ const sheetRest =
     }
   }
 
-  /* Mobil: sichtbarer Viewport (svh) + Beige-Fill bis Notch/Home-Indicator */
+  /* Mobil: 100dvh Hero (ohne Grün), SVG unten, dann Grün + sticky SVG bis Mitscrollen */
   @media (max-width: 640px) {
     .hero-pin {
-      position: relative;
       overflow: visible;
-      background: var(--beige);
-    }
-
-    /* Sticky-Viewport-Trick: Beige bleibt hinter Safari-Chrome sichtbar */
-    .hero-pin::before {
-      content: "";
-      display: block;
-      position: sticky;
-      top: 0;
-      z-index: 0;
-      height: 100svh;
-      margin-bottom: -100svh;
-      background: var(--beige);
-      pointer-events: none;
-    }
-
-    .hero-pin > :global(.nav),
-    .hero-pin > .hero {
-      position: relative;
-      z-index: 1;
     }
 
     .hero {
@@ -448,8 +421,9 @@ const sheetRest =
       position: relative;
       display: flex;
       flex-direction: column;
-      padding-top: 0;
-      min-height: 0;
+      padding-top: calc(var(--mobile-nav) + max(0.65rem, env(safe-area-inset-top, 0px)));
+      min-height: calc(100svh + var(--sheet-scroll-h));
+      min-height: calc(100dvh + var(--sheet-scroll-h));
       overflow: visible;
     }
 
@@ -457,27 +431,18 @@ const sheetRest =
       display: none;
     }
 
-    .hero__screen {
-      display: flex;
-      flex: none;
-      flex-direction: column;
-      box-sizing: border-box;
-      width: 100%;
-      /* Headline-Bereich: erste Viewport-Hälfte minus Szene (Szene ist Geschwister für sticky) */
-      height: calc(100svh - var(--scene-mobile-h) - env(safe-area-inset-bottom, 0px));
-      max-height: calc(100svh - var(--scene-mobile-h) - env(safe-area-inset-bottom, 0px));
-      padding-top: calc(var(--mobile-nav) + max(0.65rem, env(safe-area-inset-top, 0px)));
-      padding-bottom: 0;
-      background: transparent;
+    .hero > .scene {
+      flex: 0 0 auto;
     }
 
+    /* Grün erst unterhalb der ersten 100dvh – im Flow per absolute + Scroll-Track auf .hero */
     .sheet {
-      position: relative;
-      top: auto;
-      right: auto;
-      left: auto;
+      position: absolute;
+      top: 100svh;
+      top: 100dvh;
+      right: 0;
+      left: 0;
       width: 100%;
-      flex: none;
       min-height: var(--sheet-scroll-h);
       margin-top: 0;
       transform: none;
@@ -496,10 +461,17 @@ const sheetRest =
     }
 
     .hero__main {
-      flex: 1 1 auto;
+      flex: 0 0 auto;
       display: flex;
       flex-direction: column;
-      min-height: 0;
+      min-height: calc(
+        100svh - var(--mobile-nav) - max(0.65rem, env(safe-area-inset-top, 0px)) -
+          var(--scene-mobile-h)
+      );
+      min-height: calc(
+        100dvh - var(--mobile-nav) - max(0.65rem, env(safe-area-inset-top, 0px)) -
+          var(--scene-mobile-h)
+      );
     }
 
     .hero__head {
@@ -534,18 +506,15 @@ const sheetRest =
       margin-top: -0.08em;
     }
 
-    .hero > .scene {
+    .scene {
       --scene-grow: 1;
       --scene-scale: 1.12;
       --scene-nudge-x: clamp(0.65rem, 2.8vw, 1.1rem);
-      flex: none;
       position: sticky;
       bottom: 0;
       z-index: 4;
       width: 100%;
-      height: calc(var(--scene-mobile-h) + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      box-sizing: border-box;
+      height: var(--scene-mobile-h);
       container-type: size;
       pointer-events: none;
     }
