@@ -1,0 +1,28 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  /** Grüne Pill, beiger Kreis – für beigen Section-Hintergrund (Klasse: pill-link--on-beige) */
+  variant?: "default" | "on-beige" | "inverted";
+}
+
+const { href, label, variant = "default" } = Astro.props;
+const onBeige = variant === "on-beige" || variant === "inverted";
+---
+
+<a class:list={["pill-link", onBeige && "pill-link--on-beige"]} href={href}>
+  <span class="pill-link__track" aria-hidden="true">
+    <span class="pill-link__circle">
+      <svg class="pill-link__arrow" viewBox="0 0 16 16" focusable="false" aria-hidden="true">
+        <path
+          d="M3.5 8h8.2M8.8 4.8 12.2 8l-3.4 3.2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </span>
+  </span>
+  <span class="pill-link__label">{label}</span>
+</a>

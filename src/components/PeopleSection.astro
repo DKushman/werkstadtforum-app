@@ -1,0 +1,445 @@
+---
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const charDir = join(process.cwd(), "public/characters");
+
+const svgOf = (file: string) => {
+  const raw = readFileSync(join(charDir, file), "utf-8");
+  return raw.replace(/<svg\b([^>]*)>/, (_match, attrs: string) => {
+    const clean = attrs.replace(/\s(?:width|height)="[^"]*"/g, "");
+    return `<svg${clean} aria-hidden="true" focusable="false">`;
+  });
+};
+
+const facts = [
+  { kicker: "seit", value: "2019", suffix: "", label: "" },
+  { kicker: "", value: "65", suffix: "+", label: "Mitglieder" },
+  { kicker: "", value: "4", suffix: "", label: "Meetings im Jahr" },
+  { kicker: "", value: "100", suffix: " %", label: "ehrenamtlich" },
+];
+
+const stops = [
+  { name: "Händler", file: "grandpa.svg", fact: facts[0], disc: "#f1e27a", heavy: true },
+  { name: "Nachbar", file: "student.svg", fact: facts[1], disc: "#7cc1ea" },
+  { name: "Investor", file: "NACHHALTIG.svg", fact: facts[2], disc: "#8e5aa6", heavy: true },
+  { name: "Stadtplanerin", file: "kulturfreigeist.svg", fact: facts[3], disc: "#5aaf72", heavy: true },
+];
+---
+
+<section class="people" id="dabei" data-people aria-labelledby="people-heading">
+  <svg class="people__line" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    {
+      stops.map((stop) => (
+        <path class="people__line-path" pathLength="1" fill="none" style={`--leg:${stop.disc}`} />
+      ))
+    }
+  </svg>
+
+  <header class="people__head">
+    <p class="people__kicker">Wer ist dabei?</p>
+    <h2 class="people__title" id="people-heading">
+      Ein ziemlich voller <span class="people__mark">Tisch</span>.
+    </h2>
+    <p class="people__sub">
+      Nachbarn, Architektinnen, Händler, ein Pfarrer, Leute aus Politik und Verwaltung. Und hoffentlich bald du.
+    </p>
+  </header>
+
+  <div class="people__trail" data-people-trail>
+    <ul class="stops">
+      {
+        stops.map((stop, i) => (
+          <li
+            class:list={["stop", stop.heavy && "stop--bike"]}
+            id={`dabei-fakt-${i + 1}`}
+            style={`--i:${i}; --disc:${stop.disc}`}
+          >
+            <div class="stop__orb">
+              <div class="stop__pop">
+                <div class="stop__disc" data-stop-disc></div>
+                <div class="stop__figure" set:html={svgOf(stop.file)} />
+              </div>
+            </div>
+            <p class="stop__fact">
+              <span class="visually-hidden">{stop.name}. </span>
+              <span class="stop__window">
+                <span class="stop__rise">
+                  {stop.fact.kicker ? <span class="stop__kicker">{stop.fact.kicker}</span> : null}
+                  <span class="stop__num">
+                    <span class="stop__num-sizer" aria-hidden="true">{`${stop.fact.value}${stop.fact.suffix}`}</span>
+                    <span
+                      class="stop__num-value"
+                      data-value={stop.fact.value}
+                      data-suffix={stop.fact.suffix}
+                    >{`${stop.fact.value}${stop.fact.suffix}`}</span>
+                  </span>
+                  {stop.fact.label ? <span class="stop__label">{stop.fact.label}</span> : null}
+                </span>
+              </span>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  import "../scripts/people";
+</script>
+
+<style>
+  :global(.forum-bridge) {
+    position: relative;
+  }
+
+  .people {
+    position: static;
+    scroll-margin-top: 4.5rem;
+    padding: clamp(2.75rem, 7vh, 4.5rem) var(--gutter) 0;
+    background: transparent;
+    color: var(--text);
+    text-align: center;
+  }
+
+  .people__line {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    color: var(--green);
+    pointer-events: none;
+  }
+
+  .people__line-path {
+    stroke: var(--leg, currentColor);
+    stroke-linecap: butt;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: var(--draw, 1);
+  }
+
+  .people__head {
+    position: relative;
+    z-index: 2;
+    max-width: 44rem;
+    margin: 0 auto clamp(2rem, 5vh, 3rem);
+  }
+
+  .people__kicker {
+    margin: 0 0 0.55rem;
+    color: var(--muted);
+    font-size: clamp(0.95rem, 1.2vw, 1.125rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .people__title {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(2.5rem, 6.2vw, 4.6rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+
+  .people__mark {
+    display: inline-block;
+    padding: 0.02em 0.18em 0.06em;
+    border-radius: 0.12em;
+    background: var(--green);
+    color: var(--forum-text);
+  }
+
+  .people__sub {
+    max-width: 36rem;
+    margin: clamp(0.85rem, 2vh, 1.2rem) auto 0;
+    color: var(--muted);
+    font-size: clamp(1.125rem, 1.7vw, 1.4rem);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .people__trail {
+    position: relative;
+    z-index: 2;
+    padding: 0 0 clamp(7rem, 18vh, 12rem);
+  }
+
+  .stops {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(5.5rem, 14vh, 9.5rem);
+    width: min(100%, 82rem);
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stop {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(0.85rem, 2.4vw, 1.75rem);
+    width: max-content;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .stop:nth-child(odd) {
+    align-self: flex-start;
+  }
+
+  .stop:nth-child(even) {
+    align-self: flex-end;
+  }
+
+  .stop__orb {
+    position: relative;
+    flex: 0 0 clamp(11rem, 38vw, 23rem);
+    width: clamp(11rem, 38vw, 23rem);
+    aspect-ratio: 1;
+  }
+
+  .stop__pop {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 58%;
+  }
+
+  .stop__disc {
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    width: 92%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--disc, var(--green));
+    transform: translate(-50%, -42%);
+  }
+
+  .stop__figure {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .stop__figure :global(svg) {
+    display: block;
+    width: auto;
+    height: 136%;
+    max-width: 148%;
+    overflow: visible;
+  }
+
+  .stop__fact {
+    position: relative;
+    z-index: 2;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: clamp(13rem, 28vw, 18.5rem);
+    margin: 0;
+    color: var(--text);
+    text-align: left;
+  }
+
+  .stop__window {
+    display: block;
+    overflow: hidden;
+  }
+
+  .stop__rise {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.12rem;
+    transform: translate3d(0, 115%, 0);
+  }
+
+  .stop__kicker,
+  .stop__label {
+    color: var(--text);
+    font-size: clamp(1.05rem, 1.65vw, 1.45rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .stop__label {
+    max-width: 14rem;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .stop__num {
+    display: grid;
+    justify-items: start;
+    color: var(--text);
+    font-size: clamp(3.25rem, 8.5vw, 5.75rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.055em;
+    line-height: 0.88;
+  }
+
+  .stop__num-sizer,
+  .stop__num-value {
+    grid-area: 1 / 1;
+  }
+
+  .stop__num-sizer {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .people.is-armed .stop:not(.is-on) .stop__disc {
+      opacity: 0;
+      transform: translate(-50%, -42%) scale(0.74);
+    }
+
+    .people.is-armed .stop:not(.is-on) .stop__figure {
+      opacity: 0;
+      transform: translate3d(0, 6%, 0);
+    }
+
+    .people.is-armed .stop--bike:not(.is-on) .stop__figure {
+      opacity: 0;
+    }
+
+    .people.is-armed .stop.is-on .stop__disc {
+      animation: stop-pop-disc 0.85s var(--ease-out) both;
+      animation-delay: calc(var(--i) * 0.035s);
+    }
+
+    .people.is-armed .stop.is-on .stop__figure {
+      transform: translateZ(0);
+      animation: stop-pop-fig 0.7s var(--ease-out) both;
+      animation-delay: calc(var(--i) * 0.035s + 0.08s);
+    }
+
+    .people.is-armed .stop--bike.is-on .stop__figure {
+      animation: stop-fade 0.45s linear both;
+    }
+
+    .stop.is-on .stop__rise {
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.7s var(--ease-out);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stop__pop,
+    .stop__fact,
+    .stop__rise,
+    .people__line-path,
+    .stop__figure {
+      animation: none !important;
+      transition: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+    }
+
+    .people__line-path {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes stop-pop-disc {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -42%) scale(0.88);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -42%) scale(1);
+    }
+  }
+
+  @keyframes stop-pop-fig {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 6%, 0);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes stop-fade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .people__trail {
+      padding-bottom: clamp(4.5rem, 11vh, 7rem);
+    }
+
+    .stops {
+      gap: clamp(4.5rem, 12vh, 7rem);
+      width: 100%;
+    }
+
+    .stop {
+      width: 100%;
+      max-width: none;
+    }
+
+    .stop:nth-child(odd) {
+      justify-content: flex-start;
+      padding-inline-start: clamp(0.15rem, 1.2vw, 0.5rem);
+    }
+
+    .stop:nth-child(even) {
+      justify-content: flex-end;
+      padding-inline-end: clamp(0.15rem, 1.2vw, 0.5rem);
+    }
+
+    .stop__orb {
+      flex-basis: clamp(9.5rem, 44vw, 13.5rem);
+      width: clamp(9.5rem, 44vw, 13.5rem);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stop {
+      gap: 0.65rem;
+    }
+
+    .stop__orb {
+      flex-basis: clamp(9.25rem, 52vw, 12.5rem);
+      width: clamp(9.25rem, 52vw, 12.5rem);
+    }
+
+    .stop__fact {
+      max-width: 9.5rem;
+    }
+
+    .stop__num {
+      font-size: clamp(2.35rem, 11vw, 3.35rem);
+    }
+
+    .stop__kicker,
+    .stop__label {
+      font-size: 0.85rem;
+    }
+  }
+</style>

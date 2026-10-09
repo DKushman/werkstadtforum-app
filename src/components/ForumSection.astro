@@ -1,0 +1,231 @@
+---
+import { Image } from "astro:assets";
+import PillLink from "./PillLink.astro";
+import mobilitaet from "../assets/forum/mobilitaet.jpg";
+import staedtebau from "../assets/forum/staedtebau.jpg";
+import stadtleben from "../assets/forum/stadtleben.jpg";
+
+// Fotos: Pexels (Ari Setiawan, Abdel Rahman Abu Baker, Masi)
+const topics = [
+  {
+    tag: "Mobilität",
+    question: "Ku'damm ohne Autos: Traum oder Albtraum?",
+    votes: 128,
+    image: mobilitaet,
+    alt: "Menschen flanieren über eine autofreie Straße in der Stadt",
+    href: "#diskussion-mobilitaet",
+  },
+  {
+    tag: "Städtebau",
+    question: "Hochhäuser am Breitscheidplatz: Wie hoch ist zu hoch?",
+    votes: 94,
+    image: staedtebau,
+    alt: "Hochhäuser am Potsdamer Platz in Berlin vor blauem Himmel",
+    href: "#diskussion-staedtebau",
+  },
+  {
+    tag: "Stadtleben",
+    question: "Wo fehlt dir ein Ort, an dem man nichts kaufen muss?",
+    votes: 61,
+    image: stadtleben,
+    alt: "Drei Menschen sitzen auf einer Parkbank unter Bäumen",
+    href: "#diskussion-stadtleben",
+  },
+];
+---
+
+<section class="forum" id="forum" aria-labelledby="forum-heading">
+  <header class="forum__head">
+    <h2 class="forum__title" id="forum-heading">Gerade wird diskutiert.</h2>
+    <p class="forum__sub">Lies mit. Sag, was du denkst.</p>
+  </header>
+
+  <ul class="forum__track" data-lenis-prevent-horizontal>
+    {
+      topics.map((t) => (
+        <li class="forum-card">
+          <article class="forum-card__inner">
+            <div class="forum-card__media">
+              <Image
+                src={t.image}
+                alt={t.alt}
+                widths={[480, 720, 1080]}
+                sizes="(min-width: 641px) 34rem, 82vw"
+                loading="lazy"
+                decoding="async"
+                class="forum-card__img"
+              />
+              <span class="forum-card__tag">{t.tag}</span>
+            </div>
+            <div class="forum-card__body">
+              <h3 class="forum-card__question">{t.question}</h3>
+              <div class="forum-card__foot">
+                <p class="forum-card__count">
+                  <span class="forum-card__num" data-count={t.votes}>
+                    {t.votes}
+                  </span>{" "}
+                  Stimmen
+                </p>
+                <a class="cta cta--nachrichten forum-card__cta" href={t.href}>
+                  Mitreden<span class="visually-hidden">: {t.question}</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="forum__more">
+    <PillLink href="#diskussionen" label="Alle Diskussionen" />
+  </div>
+</section>
+
+<style>
+  .forum {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+    padding: clamp(2.5rem, 8vh, 5rem) 0 clamp(3rem, 10vh, 6rem);
+  }
+
+  .forum__head {
+    padding: 0 var(--gutter);
+  }
+
+  /* fit-content: die Verbindungslinie zielt auf die Textmitte */
+  .forum__title {
+    width: fit-content;
+    margin: 0;
+    color: var(--green);
+    font-size: clamp(2.25rem, 6.2vw, 4.5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  .forum__sub {
+    margin: clamp(0.5rem, 1.4vh, 0.85rem) 0 0;
+    color: var(--green);
+    font-size: clamp(1.0625rem, 1.6vw, 1.375rem);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .forum__track {
+    position: relative;
+    display: grid;
+    grid-auto-columns: min(82vw, 22rem);
+    grid-auto-flow: column;
+    gap: clamp(0.85rem, 1.6vw, 1.35rem);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: clamp(1.5rem, 4vh, 2.5rem) 0 0;
+    padding: 0.5rem var(--gutter) 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    list-style: none;
+    -ms-overflow-style: none;
+  }
+
+  .forum__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .forum-card {
+    scroll-snap-align: start;
+  }
+
+  .forum-card__inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: clamp(1.25rem, 2.6vw, 1.75rem);
+    background: #fff;
+  }
+
+  .forum-card__media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    background: var(--beige);
+  }
+
+  .forum-card__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .forum-card__tag {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    padding: 0.4em 0.8em;
+    border-radius: 999px;
+    background: var(--green);
+    color: var(--forum-text);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  .forum-card__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: clamp(1.1rem, 2.4vw, 1.5rem);
+    background: var(--beige);
+  }
+
+  .forum-card__question {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(1.3rem, 2vw, 1.65rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+
+  .forum-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: auto;
+  }
+
+  .forum-card__count {
+    margin: 0;
+    color: var(--green);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .forum-card__num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+  }
+
+  .forum__more {
+    padding: clamp(1.25rem, 3vh, 2rem) var(--gutter) 0;
+  }
+
+  @media (min-width: 641px) {
+    .forum__track {
+      grid-auto-columns: clamp(20rem, 38vw, 34rem);
+    }
+  }
+
+</style>

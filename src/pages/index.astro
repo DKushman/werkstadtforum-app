@@ -1,0 +1,27 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import PlacesSection from "../components/PlacesSection.astro";
+import UpcomingSection from "../components/UpcomingSection.astro";
+import ChartaSection from "../components/ChartaSection.astro";
+import PeopleSection from "../components/PeopleSection.astro";
+import MitmachenSection from "../components/MitmachenSection.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+---
+
+<Base
+  title="WerkStadtForum – Lasst uns Berlin City West planen, bauen, gestalten"
+  description="Das WerkStadtForum bringt Menschen zusammen, um die Berliner City West gemeinsam zu planen, zu bauen und zu gestalten."
+>
+  <div class="page-sheet">
+    <Hero />
+    <PlacesSection />
+    <UpcomingSection />
+    <ChartaSection />
+    <div class="forum-bridge">
+      <PeopleSection />
+      <MitmachenSection />
+    </div>
+  </div>
+  <SiteFooter />
+</Base>

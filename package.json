@@ -1,0 +1,26 @@
+{
+  "name": "werkstadtforum",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "scene": "bun scripts/build-scene.ts",
+    "build": "bun scripts/build-scene.ts && bun scripts/fetch-upcoming-images.ts && astro build",
+    "upcoming:images": "bun scripts/fetch-upcoming-images.ts",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.3.5",
+    "lenis": "^1.3.26"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/bun": "^1.4.2",
+    "svg-path-bbox": "^2.1.0",
+    "svgo": "^4.1.0",
+    "typescript": "6"
+  }
+}

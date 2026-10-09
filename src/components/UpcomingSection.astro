@@ -1,0 +1,395 @@
+---
+import { Image } from "astro:assets";
+import PillLink from "./PillLink.astro";
+import terminImg from "../assets/upcoming/termin.jpg";
+import newsPodcastImg from "../assets/upcoming/news-podcast.jpg";
+import newsRueckblickImg from "../assets/upcoming/news-rueckblick.jpg";
+import { dayNumber, longDateLabel, todayIso } from "../lib/timeline";
+
+const today = todayIso();
+
+const rawEvents = [
+  {
+    kind: "news" as const,
+    date: "2026-09-15",
+    dateLabel: "15. Sep. 2026",
+    title: "Rückblick: Das war das Forum im September",
+    href: "#nachricht-rueckblick",
+    image: newsRueckblickImg,
+    alt: "Menschen sitzen an einem Tisch in einer Diskussionsrunde",
+  },
+  {
+    kind: "news" as const,
+    date: "2026-10-28",
+    dateLabel: "28. Okt. 2026",
+    title: "Neue Podcast-Reihe startet aus dem THE_SPACE",
+    href: "#nachricht-podcast",
+    image: newsPodcastImg,
+    alt: "Mikrofon und Kopfhörer in einem Podcast-Studio",
+  },
+  {
+    kind: "termin" as const,
+    date: "2026-11-12",
+    datetime: "2026-11-12T18:00:00+01:00",
+    dateLabel: "Do, 12. Nov. · 18 Uhr",
+    title: "WerkStadtForum #12: Wem gehört der Ku’damm?",
+    venue: "Europa-Center, Tauentzienstraße 11",
+    href: "#platz-sichern",
+    image: terminImg,
+    alt: "Besucherinnen und Besucher bei einer Veranstaltung in Berlin",
+    cta: "Platz sichern",
+  },
+].sort((a, b) => a.date.localeCompare(b.date));
+
+const nextIndex = rawEvents.findIndex((e) => e.date >= today);
+const events = rawEvents.map((e, i) => ({
+  ...e,
+  past: e.date < today,
+  next: i === nextIndex,
+}));
+---
+
+<section class="upcoming" id="termine" aria-labelledby="upcoming-heading">
+  <svg class="upcoming-line" aria-hidden="true" focusable="false">
+    <path class="upcoming-line__seg" pathLength="1" />
+    {events.map(() => <circle class="upcoming-line__dot" r="6.5"></circle>)}
+  </svg>
+
+  <header class="upcoming__head">
+    <h2 class="upcoming__title" id="upcoming-heading">
+      Was steht <span class="upcoming__mark">an</span>?
+    </h2>
+    <p class="upcoming__now">
+      <span class="upcoming__dot" data-tl-dot aria-hidden="true"></span>
+      <time datetime={today} data-tl-today>
+        <span class="visually-hidden">Heute, </span>
+        <span data-tl-today-label>{longDateLabel(today)}</span>
+      </time>
+    </p>
+  </header>
+
+  <ol class="upcoming__list">
+    {
+      events.map((item, index) => (
+        <li
+            class:list={["upcoming-card", { "is-past": item.past, "is-next": item.next }]}
+            data-date={item.date}
+            style={`--pop-i: ${index}`}
+        >
+          <a class="upcoming-card__link" href={item.href}>
+            <span class="upcoming-card__media">
+              <Image
+                src={item.image}
+                alt={item.alt}
+                widths={[480, 720, 960, 1200]}
+                sizes="(min-width: 700px) 24rem, 92vw"
+                loading="lazy"
+                decoding="async"
+                class="upcoming-card__img"
+              />
+              <span class="media-tag upcoming-card__tag">{item.kind === "termin" ? "Termin" : "Nachricht"}</span>
+            </span>
+            <span class="upcoming-card__body">
+              <time class="upcoming-card__meta" datetime={item.kind === "termin" ? item.datetime : item.date}>
+                {item.dateLabel}
+              </time>
+              <h3 class="upcoming-card__title">{item.title}</h3>
+              {item.kind === "termin" && (
+                <>
+                  <span class="upcoming-card__venue">{item.venue}</span>
+                  <span class="cta cta--nachrichten upcoming-card__cta">{item.cta}</span>
+                </>
+              )}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="upcoming__more">
+    <PillLink href="#alle-nachrichten" label="Alle Nachrichten" variant="on-beige" />
+  </div>
+</section>
+
+<script>
+  import "../scripts/upcoming-line";
+</script>
+
+<style>
+  .upcoming {
+    position: relative;
+    padding: clamp(3rem, 9vh, 5.5rem) var(--gutter) clamp(3.5rem, 10vh, 6rem);
+    overflow: hidden;
+    background: var(--beige);
+  }
+
+  .upcoming__head,
+  .upcoming__list,
+  .upcoming__more {
+    position: relative;
+    z-index: 1;
+  }
+
+  .upcoming__title {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(2.5rem, 6.5vw, 4.75rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+
+  .upcoming__mark {
+    display: inline-block;
+    padding: 0.04em 0.22em 0.1em;
+    border-radius: 0.12em;
+    background: var(--green);
+    color: var(--forum-text);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .upcoming__now {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: clamp(0.9rem, 2vh, 1.25rem) 0 0;
+  }
+
+  .upcoming__dot {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #c8262b;
+  }
+
+  .upcoming__now time {
+    color: #c8262b;
+    font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .upcoming__list {
+    padding-left: var(--rail, 1.35rem);
+  }
+
+  .upcoming__list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.25rem, 7vh, 3.75rem);
+    margin: clamp(1.75rem, 5vh, 2.75rem) 0 0;
+    list-style: none;
+  }
+
+  .upcoming-card {
+    width: min(100%, 58rem);
+    opacity: 0;
+    transform: translateY(1.35rem);
+  }
+
+  .upcoming-card.is-inview {
+    animation: upcoming-pop 0.55s var(--ease-throw) forwards;
+  }
+
+  @keyframes upcoming-pop {
+    0% {
+      opacity: 0;
+      transform: translateY(1.35rem);
+    }
+
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .upcoming-card__link {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    height: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--green);
+    border-radius: clamp(1.15rem, 2vw, 1.45rem);
+    background: #fbf8ef;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .is-next .upcoming-card__link {
+    box-shadow: inset 0 0 0 1px var(--green);
+  }
+
+  .is-past .upcoming-card__link {
+    border-color: rgb(27 74 20 / 0.4);
+  }
+
+  .upcoming-card__link:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 4px;
+  }
+
+  .upcoming-card__media {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border-radius: calc(clamp(1.15rem, 2vw, 1.45rem) - 0.4rem);
+    background: #e8e4d8;
+  }
+
+  .upcoming-card__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.55s var(--ease-out);
+  }
+
+  .upcoming-card__tag {
+    position: absolute;
+    top: 0.55rem;
+    left: 0.55rem;
+  }
+
+  .upcoming-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.15rem 0.4rem 0.35rem;
+  }
+
+  .upcoming-card__meta {
+    color: var(--green);
+    font-size: clamp(0.8125rem, 1vw, 0.9375rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .is-past .upcoming-card__meta {
+    color: #5a574f;
+  }
+
+  .upcoming-card__title {
+    margin: 0;
+    font-size: clamp(1.45rem, 2.3vw, 2.15rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .upcoming-card__venue {
+    color: var(--text);
+    font-size: clamp(0.9375rem, 1.1vw, 1.0625rem);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .upcoming-card__cta {
+    align-self: flex-start;
+    margin-top: 0.35rem;
+  }
+
+  .upcoming__more {
+    margin-top: clamp(2.5rem, 7vh, 4rem);
+  }
+
+  .upcoming-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    color: var(--green);
+    pointer-events: none;
+  }
+
+  .upcoming-line__seg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  .upcoming-line__dot {
+    fill: var(--green);
+    opacity: 0;
+    transform: scale(0.4);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 0.25s var(--ease-out),
+      transform 0.35s var(--ease-bounce);
+  }
+
+  .upcoming-line__dot.is-on {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (min-width: 700px) {
+    .upcoming-line__seg {
+      stroke-width: 10;
+    }
+
+    .upcoming-card__link {
+      grid-template-columns: minmax(18rem, 24rem) 1fr;
+      align-items: stretch;
+      min-height: 18rem;
+      gap: 1.25rem;
+      padding: 0.85rem;
+    }
+
+    .upcoming-card__media {
+      height: 100%;
+      min-height: 16.5rem;
+      aspect-ratio: auto;
+    }
+
+    .upcoming-card__body {
+      justify-content: center;
+      padding: 0.65rem 0.85rem 0.65rem 0.35rem;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .upcoming-card__media:hover .upcoming-card__img {
+      transform: scale(1.05);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .upcoming-card,
+    .upcoming-card.is-inview {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
+    .upcoming-card.is-inview:hover,
+    .upcoming-card.is-inview:focus-within,
+    .upcoming-card__img,
+    .upcoming-line__dot {
+      transform: none;
+      transition: none;
+    }
+
+    .upcoming-card__img {
+      transform: none;
+    }
+
+    .upcoming-line__dot.is-on {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,283 @@
+/* Work Sans – lokal, auf Latin + Deutsch reduziert */
+@font-face {
+  font-family: "Work Sans";
+  src: url("/fonts/work-sans-800.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Work Sans";
+  src: url("/fonts/work-sans-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --beige: #f5f1e4;
+  --beige-muted: #b8b0a0;
+  --green: #1b4a14;
+  --ink: #0b0708;
+  --text: #262420;
+  --muted: #8b877c;
+  --forum-text: #cdf0a3;
+  --green-light: #3a7a30;
+  --yellow: #e9cb6f;
+  --yellow-light: #f3e2a8;
+  --sheet: #b3e79b;
+  --pill-bg: #f2f0e4;
+  --pill-icon-bg: #e6e2d8;
+  --logo-blue: #7cc1ea;
+  --logo-purple: #8e5aa6;
+  --accent-blue: #1a5f8a;
+  --accent-blue-fg: #eef8ff;
+
+  --gutter: clamp(1rem, 4.2vw, 4.25rem);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-throw: cubic-bezier(0.34, 1.45, 0.64, 1);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+  background: var(--beige);
+  color: var(--text);
+  font-family: "Work Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1 {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Pills auf Fotos (dunkelgrün wie Forum-Tags) */
+.media-tag {
+  display: inline-block;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--forum-text);
+  font-size: clamp(0.6875rem, 0.85vw, 0.8125rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* Pill-Link – auf Beige: .pill-link--on-beige (grüne Pill, beiger Kreis) */
+.pill-link {
+  --icon: clamp(2.35rem, 2.8vw, 2.65rem);
+  --p: clamp(0.35rem, 0.6vw, 0.45rem);
+  --q: clamp(1rem, 1.6vw, 1.3rem);
+  --gap: clamp(0.6rem, 1vw, 0.8rem);
+  --ease-swap: cubic-bezier(0.76, 0, 0.24, 1);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: calc(var(--icon) + var(--p) * 2);
+  padding: var(--p) var(--q) var(--p) calc(var(--p) + var(--icon) + var(--gap));
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.pill-link__track {
+  position: absolute;
+  top: var(--p);
+  bottom: var(--p);
+  left: var(--p);
+  right: calc(var(--p) + var(--icon));
+  transition: transform 0.55s var(--ease-swap);
+}
+
+.pill-link__circle {
+  display: grid;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  border-radius: 50%;
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.pill-link__arrow {
+  width: 42%;
+  height: 42%;
+}
+
+.pill-link__label {
+  transition: transform 0.55s var(--ease-swap);
+}
+
+.pill-link--on-beige,
+.pill-link--inverted {
+  background: var(--sheet);
+}
+
+.pill-link--on-beige .pill-link__circle,
+.pill-link--inverted .pill-link__circle {
+  background: var(--pill-bg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill-link:hover .pill-link__track,
+  .pill-link:focus-visible .pill-link__track {
+    transform: translateX(100%);
+  }
+
+  .pill-link:hover .pill-link__label,
+  .pill-link:focus-visible .pill-link__label {
+    transform: translateX(calc(var(--q) - var(--p) - var(--icon) - var(--gap)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-link__track,
+  .pill-link__label {
+    transition: none;
+  }
+}
+
+/* Hinterlegter CTA (Nav Forum/Nachrichten, Karten-Buttons) */
+.cta {
+  --cta-bg: var(--green);
+  --cta-fg: var(--forum-text);
+  --cta-hover-bg: var(--green-light);
+  --cta-hover-fg: var(--cta-fg);
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 44px;
+  height: clamp(2.35rem, 2.65vw, 2.85rem);
+  padding: 0 clamp(1rem, 1.6vw, 1.65rem);
+  border-radius: clamp(0.55rem, 0.9vw, 0.65rem);
+  background: var(--cta-bg);
+  color: var(--cta-fg);
+  font-weight: 800;
+  font-size: clamp(0.8125rem, 0.95vw, 1rem);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  isolation: isolate;
+  transition:
+    transform 0.35s var(--ease-bounce),
+    color 0.35s var(--ease-out);
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--cta-hover-bg);
+  transform: scale(0);
+  transition: transform 0.45s var(--ease-out);
+}
+
+.cta:hover,
+.cta:focus-visible {
+  transform: scale(1.08);
+  color: var(--cta-hover-fg);
+}
+
+.cta:hover::before,
+.cta:focus-visible::before {
+  transform: scale(1);
+}
+
+.cta:active {
+  transform: scale(1.02);
+}
+
+.cta--forum {
+  --cta-bg: var(--green);
+  --cta-fg: var(--forum-text);
+  --cta-hover-bg: var(--green-light);
+}
+
+.cta--nachrichten {
+  --cta-bg: var(--yellow);
+  --cta-fg: var(--ink);
+  --cta-hover-bg: var(--yellow-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .cta::before {
+    transition: none;
+  }
+
+  .cta:hover,
+  .cta:focus-visible {
+    transform: none;
+  }
+}

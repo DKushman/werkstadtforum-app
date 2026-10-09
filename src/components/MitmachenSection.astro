@@ -1,0 +1,504 @@
+---
+import { Image } from "astro:assets";
+import hero from "../assets/mitmachen/hero.jpg";
+import logoBezirk from "../assets/logos/web/bezirk.png";
+import logoAgCity from "../assets/logos/web/ag-city.png";
+import logoIhk from "../assets/logos/web/ihk-berlin.png";
+import logoVbki from "../assets/logos/web/vbki.png";
+import logoWerkbund from "../assets/logos/web/werkbund-berlin.png";
+
+const partners = [
+  { src: logoBezirk, alt: "Bezirksamt Charlottenburg-Wilmersdorf" },
+  { src: logoAgCity, alt: "AG City" },
+  { src: logoIhk, alt: "IHK Berlin" },
+  { src: logoVbki, alt: "VBKI" },
+  { src: logoWerkbund, alt: "Werkbund Berlin" },
+];
+
+const ways = [
+  {
+    title: "Komm vorbei.",
+    text: "Vier Versammlungen im Jahr, offen für alle. Einfach bewerben und dazusetzen.",
+    href: "#termine",
+    cta: "Nächster Termin",
+    variant: "forum" as const,
+    tone: "brown" as const,
+    focus: "22% 40%",
+  },
+  {
+    title: "Red mit.",
+    text: "Im Forum, wann du willst. Lesen geht ohne Anmeldung.",
+    href: "#forum",
+    cta: "Zum Forum",
+    variant: "forum" as const,
+    tone: "purple" as const,
+    focus: "50% 45%",
+  },
+  {
+    title: "Schreib uns.",
+    text: "Du hast eine Idee, eine Frage oder ein Thema, das fehlt?",
+    href: "#nachrichten",
+    cta: "Nachricht schreiben",
+    variant: "nachrichten" as const,
+    tone: "orange" as const,
+    focus: "78% 42%",
+  },
+];
+---
+
+<section class="mitmachen" id="mitmachen" aria-labelledby="mitmachen-heading">
+  <div class="mitmachen__head">
+    <h2 class="mitmachen__title" id="mitmachen-heading">
+      Meckern kann jeder. <span class="mitmachen__mark">Mitreden</span> auch.
+    </h2>
+    <p class="mitmachen__sub">Such dir aus, wie du einsteigst.</p>
+  </div>
+
+  <ul class="mitmachen__grid">
+    {
+      ways.map((way) => (
+        <li>
+          <article class:list={["mitmachen__tile", `mitmachen__tile--${way.tone}`]}>
+            <div class="mitmachen__copy">
+              <h3 class="mitmachen__tile-title">{way.title}</h3>
+              <p class="mitmachen__tile-text">{way.text}</p>
+            </div>
+            <div class="mitmachen__visual" aria-hidden="true">
+              <Image
+                src={hero}
+                alt=""
+                width={800}
+                height={600}
+                widths={[400, 600, 800]}
+                sizes="(min-width: 900px) 28vw, 85vw"
+                loading="lazy"
+                decoding="async"
+                class="mitmachen__shot"
+                style={`object-position: ${way.focus}`}
+              />
+            </div>
+            <a
+              class:list={[
+                "mitmachen__action",
+                "cta",
+                "mitmachen__action--pill",
+                way.variant === "nachrichten" && "cta--nachrichten",
+                way.variant === "forum" && "cta--forum",
+              ]}
+              href={way.href}
+            >
+              {way.cta}
+            </a>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="mitmachen__fine">
+    Du vertrittst ein Unternehmen oder eine Institution?
+    <a class="mitmachen__partner" href="#partner">Partner werden →</a>
+  </p>
+
+  <div class="sponsors" data-sponsors>
+    <p class="sponsors__label">Initiiert von</p>
+    <div class="sponsors__marquee">
+      <div class="sponsors__track">
+        <ul class="sponsors__logos">
+          {
+            partners.map((logo) => (
+              <li>
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  height={160}
+                  densities={[1, 2]}
+                  loading="lazy"
+                  decoding="async"
+                  class="sponsors__logo"
+                />
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="sponsors__logos sponsors__logos--clone" aria-hidden="true">
+          {
+            partners.map((logo) => (
+              <li>
+                <Image
+                  src={logo.src}
+                  alt=""
+                  height={160}
+                  densities={[1, 2]}
+                  loading="lazy"
+                  decoding="async"
+                  class="sponsors__logo"
+                />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mitmachen {
+    position: relative;
+    margin-top: clamp(3rem, 8vh, 6rem);
+    padding: clamp(4.5rem, 12vh, 8rem) var(--gutter) 0;
+    background: transparent;
+    color: var(--text);
+  }
+
+  .mitmachen__head {
+    position: relative;
+    z-index: 2;
+    max-width: 40rem;
+    margin: 0 auto clamp(2rem, 5vh, 3rem);
+    text-align: center;
+  }
+
+  .mitmachen__title {
+    margin: 0;
+    color: var(--green);
+    font-size: clamp(2.25rem, 5.5vw, 3.75rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .mitmachen__mark {
+    display: inline-block;
+    padding: 0.02em 0.16em 0.06em;
+    border-radius: 0.12em;
+    background: var(--yellow);
+    color: var(--green);
+  }
+
+  .mitmachen__sub {
+    margin: clamp(0.75rem, 1.8vh, 1.1rem) 0 0;
+    color: var(--muted);
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+    font-weight: 600;
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+
+  .mitmachen__grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: clamp(1.25rem, 2.6vw, 1.65rem);
+    max-width: min(96rem, 100%);
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 900px) {
+    .mitmachen__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .mitmachen {
+      margin-top: clamp(1.25rem, 3vh, 2.5rem);
+      padding-top: clamp(2.75rem, 7vh, 4.5rem);
+    }
+
+    .mitmachen__tile {
+      opacity: 0.92;
+      transition: none;
+    }
+
+    .mitmachen__tile.mitmachen__tile--brown {
+      --tile-bg: #5a3e32;
+      --tile-fg: var(--beige);
+      --tile-sub: rgb(245 241 228 / 0.9);
+    }
+
+    .mitmachen__tile.mitmachen__tile--purple {
+      --tile-bg: #7a4c92;
+      --tile-fg: var(--beige);
+      --tile-sub: rgb(245 241 228 / 0.9);
+    }
+
+    .mitmachen__tile.mitmachen__tile--orange {
+      --tile-bg: #b5542d;
+      --tile-fg: #fff8f3;
+      --tile-sub: rgb(255 248 243 / 0.92);
+    }
+
+    .mitmachen__tile:hover,
+    .mitmachen__tile:focus-within,
+    .mitmachen__tile:active {
+      opacity: 0.92;
+      box-shadow: 0 0.35rem 1.25rem rgb(11 7 8 / 0.06);
+    }
+
+    .mitmachen__tile-text,
+    .mitmachen__visual {
+      transition: none;
+    }
+  }
+
+  .mitmachen__tile {
+    --tile-bg: #ede8db;
+    --tile-fg: var(--text);
+    --tile-sub: var(--text);
+    --tile-visual-h: clamp(14rem, 30vh, 17.5rem);
+    --tile-copy-h: clamp(7.5rem, 15vh, 8.75rem);
+    --tile-cta-h: 3.1rem;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.85rem, 1.8vh, 1.15rem);
+    min-height: clamp(32rem, 58vh, 38rem);
+    padding: clamp(1.65rem, 2.8vw, 2.25rem);
+    border-radius: clamp(1.75rem, 3.2vw, 2.5rem);
+    background: var(--tile-bg);
+    color: var(--tile-fg);
+    box-shadow: 0 0.35rem 1.25rem rgb(11 7 8 / 0.06);
+    transition:
+      background 0.45s var(--ease-out),
+      color 0.45s var(--ease-out),
+      box-shadow 0.45s var(--ease-out);
+  }
+
+  .mitmachen__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    min-height: var(--tile-copy-h);
+    text-align: left;
+  }
+
+  .mitmachen__tile-title {
+    margin: 0;
+    font-size: clamp(1.45rem, 2.2vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    color: inherit;
+  }
+
+  .mitmachen__tile-text {
+    margin: 0;
+    max-width: 22em;
+    font-size: clamp(0.92rem, 1.1vw, 1.02rem);
+    font-weight: 600;
+    line-height: 1.42;
+    color: var(--tile-sub);
+    transition: color 0.45s var(--ease-out);
+  }
+
+  .mitmachen__visual {
+    display: flex;
+    flex: 0 0 var(--tile-visual-h);
+    align-items: center;
+    justify-content: center;
+    height: var(--tile-visual-h);
+    border-radius: clamp(1rem, 1.8vw, 1.35rem);
+    overflow: hidden;
+    background: rgb(245 241 228 / 0.55);
+    transition: background 0.45s var(--ease-out);
+  }
+
+  .mitmachen__shot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  .mitmachen__action {
+    align-self: stretch;
+    width: 100%;
+    min-height: var(--tile-cta-h);
+    margin-top: auto;
+  }
+
+  .mitmachen__action--pill {
+    justify-content: center;
+    min-height: var(--tile-cta-h);
+    padding: 0.75rem 1.15rem;
+    border-radius: clamp(0.55rem, 0.85vw, 0.7rem);
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    text-align: center;
+    white-space: normal;
+  }
+
+  @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+    .mitmachen__tile:hover,
+    .mitmachen__tile:focus-within {
+      --tile-bg: rgb(61 42 34 / 0.94);
+      --tile-fg: var(--beige);
+      --tile-sub: rgb(245 241 228 / 0.88);
+      box-shadow: 0 0.85rem 2.25rem rgb(11 7 8 / 0.18);
+    }
+
+    .mitmachen__tile:hover .mitmachen__visual,
+    .mitmachen__tile:focus-within .mitmachen__visual {
+      background: rgb(245 241 228 / 0.12);
+    }
+
+    .mitmachen__tile:hover .mitmachen__action,
+    .mitmachen__tile:focus-within .mitmachen__action {
+      --cta-bg: var(--beige);
+      --cta-fg: #3d2a22;
+      --cta-hover-bg: var(--yellow);
+      --cta-hover-fg: var(--ink);
+    }
+  }
+
+  .mitmachen__fine {
+    position: relative;
+    z-index: 2;
+    max-width: 36rem;
+    margin: clamp(2rem, 4vh, 2.75rem) auto 0;
+    color: var(--muted);
+    font-size: clamp(0.875rem, 1.05vw, 0.98rem);
+    font-weight: 600;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .mitmachen__partner {
+    display: inline-block;
+    margin-left: 0.35em;
+    color: var(--green);
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  .mitmachen__partner:hover,
+  .mitmachen__partner:focus-visible {
+    color: var(--green-light);
+  }
+
+  .sponsors {
+    position: relative;
+    z-index: 2;
+    margin: clamp(2.75rem, 7vh, 4.5rem) calc(-1 * var(--gutter)) 0;
+    padding: clamp(1.75rem, 4vh, 2.75rem) 0 clamp(2.25rem, 5vh, 3.25rem);
+    overflow-x: clip;
+    background: var(--beige);
+    border-radius: 0 0 clamp(1.75rem, 3.2vw, 2.5rem) clamp(1.75rem, 3.2vw, 2.5rem);
+  }
+
+  .sponsors__label {
+    margin: 0 0 clamp(0.85rem, 2vh, 1.25rem);
+    color: var(--text);
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+
+  .sponsors__marquee {
+    width: 100%;
+    overflow-x: clip;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 2%, #000 98%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 2%, #000 98%, transparent);
+  }
+
+  .sponsors__track {
+    display: flex;
+    width: max-content;
+    flex-wrap: nowrap;
+  }
+
+  .sponsors__logos {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: clamp(3rem, 7vw, 6.5rem);
+    margin: 0;
+    padding: 0.85rem clamp(2rem, 5vw, 4.5rem);
+    list-style: none;
+  }
+
+  .sponsors__logos li {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .sponsors__logo {
+    display: block;
+    width: auto;
+    height: clamp(4rem, 8.5vw, 6.75rem);
+    max-width: none;
+    transition: transform 0.45s var(--ease-bounce);
+  }
+
+  @media (min-width: 641px) and (hover: hover) and (pointer: fine) {
+    .sponsors__logos li:nth-child(odd):hover .sponsors__logo {
+      transform: rotate(-5deg) scale(1.06);
+    }
+
+    .sponsors__logos li:nth-child(even):hover .sponsors__logo {
+      transform: rotate(5deg) scale(1.06);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sponsors.is-seen .sponsors__track {
+      animation: sponsors-run 48s linear infinite;
+      animation-play-state: paused;
+    }
+
+    .sponsors.is-seen.is-inview .sponsors__track {
+      animation-play-state: running;
+    }
+
+    .sponsors.is-seen .sponsors__marquee:focus-within .sponsors__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    .sponsors.is-seen .sponsors__marquee:hover .sponsors__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sponsors__marquee {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .sponsors__track {
+      width: auto;
+      justify-content: center;
+    }
+
+    .sponsors__logos {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 1.5rem;
+    }
+
+    .sponsors__logos--clone {
+      display: none;
+    }
+  }
+
+  @keyframes sponsors-run {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(calc(-1 * var(--marquee-shift, 0px)), 0, 0);
+    }
+  }
+</style>

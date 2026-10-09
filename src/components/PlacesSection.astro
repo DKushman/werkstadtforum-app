@@ -1,0 +1,513 @@
+---
+import PillLink from "./PillLink.astro";
+import CityWestMap from "./CityWestMap.astro";
+
+/**
+ * x/y: Punkt auf der Karte (viewBox 1000 × 520).
+ * side: Seite, auf der das Popover auf Desktop aufgeht.
+ * Texte und Status für Tauentzienstraße und Zoologischer Garten sind Platzhalter.
+ */
+const places = [
+  {
+    id: "breitscheidplatz",
+    num: "1",
+    name: "Breitscheidplatz",
+    text: "Das Herz der City West soll wieder ein Platz zum Bleiben werden.",
+    status: "In Planung",
+    tone: "planung",
+    x: 819,
+    y: 212,
+    side: "left",
+  },
+  {
+    id: "hardenbergplatz",
+    num: "2",
+    name: "Hardenbergplatz",
+    text: "Aus dem Busparkplatz wird das neue Eingangstor zur City West.",
+    status: "In Diskussion",
+    tone: "diskussion",
+    x: 765,
+    y: 181,
+    side: "left",
+  },
+  {
+    id: "kurfuerstendamm",
+    num: "3",
+    name: "Kurfürstendamm",
+    text: "Weniger Durchgangsverkehr, mehr Raum zum Flanieren.",
+    status: "In Diskussion",
+    tone: "diskussion",
+    x: 600,
+    y: 282,
+    side: "right",
+  },
+  {
+    id: "messe",
+    num: "4",
+    name: "Messe / ICC",
+    text: "Ein neuer Standort für Forschung, Wohnen und Logistik.",
+    status: "Idee",
+    tone: "idee",
+    x: 150,
+    y: 178,
+    side: "right",
+  },
+  {
+    id: "tauentzien",
+    num: "5",
+    name: "Tauentzienstraße",
+    text: "Die Einkaufsmeile bekommt breitere Gehwege, mehr Bäume und Platz zum Verweilen.",
+    status: "In Diskussion",
+    tone: "diskussion",
+    x: 885,
+    y: 256,
+    side: "left",
+  },
+  {
+    id: "zoo",
+    num: "6",
+    name: "Zoologischer Garten",
+    text: "Der Zoo öffnet sich zur Stadt: neue Eingänge und Wege zum Hardenbergplatz.",
+    status: "Idee",
+    tone: "idee",
+    x: 850,
+    y: 120,
+    side: "left",
+  },
+] as const;
+---
+
+<section class="places" id="orte" data-active="breitscheidplatz" aria-labelledby="places-heading">
+  <header class="places__head">
+    <h2 class="places__title" id="places-heading">Wo und was wird gebaut?</h2>
+    <p class="places__sub">Sechs Orte, an denen sich die City West gerade verändert.</p>
+  </header>
+
+  <div class="places__stage">
+    <div class="places__board">
+      <div class="places__map">
+        <CityWestMap places={places} />
+      </div>
+
+      <ol class="places__list">
+        {
+          places.map((p) => (
+            <li class="place" id={`ort-${p.id}`} data-ort={p.id}>
+              <details class="place__card">
+                <summary class="place__top">
+                  <span class="place__num" aria-hidden="true">
+                    {p.num}
+                  </span>
+                  <span class="place__headline">
+                    <span class="place__name">{p.name}</span>
+                    <span class={`place__status place__status--${p.tone}`}>{p.status}</span>
+                  </span>
+                  <svg class="place__chev" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path
+                      d="M3.5 6 8 10.5 12.5 6"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </summary>
+                <div class="place__body">
+                  <p class="place__text" id={`ort-${p.id}-text`}>
+                    {p.text}
+                  </p>
+                  <a class="place__link" href={`#diskussion-${p.id}`}>
+                    Zur Diskussion<span class="visually-hidden">: {p.name}</span>
+                    <svg class="place__arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                      <path
+                        d="M3.5 8h8.2M8.8 4.8 12.2 8l-3.4 3.2"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </details>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+
+  <div class="places__more">
+    <PillLink href="#alle-orte" label="Alle Orte ansehen" variant="on-beige" />
+  </div>
+</section>
+
+<script>
+  import "../scripts/places";
+</script>
+
+<style>
+  .places {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(3rem, 9vh, 5rem) 0 clamp(3rem, 10vh, 5rem);
+  }
+
+  .places__head {
+    padding: 0 var(--gutter);
+  }
+
+  .places__title {
+    margin: 0;
+    color: var(--green);
+    font-size: clamp(2.25rem, 6.2vw, 4.5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  .places__sub {
+    margin: clamp(0.5rem, 1.4vh, 0.85rem) 0 0;
+    color: var(--green);
+    font-size: clamp(1.0625rem, 1.6vw, 1.375rem);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .places__stage {
+    margin-top: clamp(1.5rem, 4vh, 2.5rem);
+    padding: 0 var(--gutter);
+  }
+
+  .places__board {
+    position: relative;
+  }
+
+  /* ---------- Mobil: Karte klebt unter der fixen Nav, Orte als Aufklapp-Liste ---------- */
+  .places__map {
+    position: sticky;
+    top: calc(4.25rem + env(safe-area-inset-top, 0px));
+    z-index: 2;
+    padding: 0.5rem 0 0.75rem;
+    background: var(--beige);
+  }
+
+  .places__list {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .place {
+    scroll-margin-top: calc(75vw + 6rem);
+  }
+
+  .place__card {
+    position: relative;
+    border-radius: clamp(1.25rem, 2.6vw, 1.75rem);
+    background: #fff;
+  }
+
+  /* Aktiv-Rahmen: eigenes Pseudo-Element, nur opacity animiert */
+  .place__card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--green);
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease-out);
+  }
+
+  .places[data-active="breitscheidplatz"] .place[data-ort="breitscheidplatz"],
+  .places[data-active="hardenbergplatz"] .place[data-ort="hardenbergplatz"],
+  .places[data-active="kurfuerstendamm"] .place[data-ort="kurfuerstendamm"],
+  .places[data-active="messe"] .place[data-ort="messe"],
+  .places[data-active="tauentzien"] .place[data-ort="tauentzien"],
+  .places[data-active="zoo"] .place[data-ort="zoo"] {
+    --on: 1;
+  }
+
+  .place {
+    --on: 0;
+  }
+
+  .place__card::after {
+    opacity: var(--on);
+  }
+
+  .place__top {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    padding: clamp(0.9rem, 2vw, 1.25rem) clamp(1.1rem, 2.4vw, 1.5rem);
+    list-style: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .place__top::-webkit-details-marker {
+    display: none;
+  }
+
+  .place__top::marker {
+    content: "";
+  }
+
+  /* Nummer: grün, bei aktivem Ort gelb (Farbe über Pseudo-Element, nur opacity) */
+  .place__num {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--forum-text);
+    font-size: 0.9375rem;
+    font-weight: 800;
+    isolation: isolate;
+  }
+
+  .place__num::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--yellow);
+    opacity: var(--on);
+    transition: opacity 0.3s var(--ease-out);
+  }
+
+  .place__num {
+    color: var(--forum-text);
+    transition: color 0.3s var(--ease-out);
+  }
+
+  .places[data-active="breitscheidplatz"] .place[data-ort="breitscheidplatz"] .place__num,
+  .places[data-active="hardenbergplatz"] .place[data-ort="hardenbergplatz"] .place__num,
+  .places[data-active="kurfuerstendamm"] .place[data-ort="kurfuerstendamm"] .place__num,
+  .places[data-active="messe"] .place[data-ort="messe"] .place__num,
+  .places[data-active="tauentzien"] .place[data-ort="tauentzien"] .place__num,
+  .places[data-active="zoo"] .place[data-ort="zoo"] .place__num {
+    color: var(--ink);
+  }
+
+  .place__headline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem 0.65rem;
+    min-width: 0;
+  }
+
+  .place__name {
+    color: var(--ink);
+    font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .place__status {
+    padding: 0.4em 0.8em;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .place__status--planung {
+    background: var(--green);
+    color: var(--forum-text);
+  }
+
+  .place__status--diskussion {
+    background: #a84422;
+    color: var(--beige);
+  }
+
+  .place__status--idee {
+    background: var(--accent-blue);
+    color: var(--accent-blue-fg);
+  }
+
+  .place__chev {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--green);
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .place__card[open] .place__chev {
+    transform: rotate(180deg);
+  }
+
+  .place__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 clamp(1.1rem, 2.4vw, 1.5rem) clamp(1rem, 2.2vw, 1.4rem);
+  }
+
+  .place__text {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.25vw, 1.125rem);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .place__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    align-self: flex-start;
+    min-height: 44px;
+    color: var(--green);
+    font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .place__arrow {
+    width: 1.1em;
+    height: 1.1em;
+    transition: transform 0.35s var(--ease-bounce);
+  }
+
+  .place__link:hover .place__arrow,
+  .place__link:focus-visible .place__arrow {
+    transform: translateX(0.3em);
+  }
+
+  .place__link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+
+  .places__more {
+    padding: clamp(1.5rem, 4vh, 2.5rem) var(--gutter) 0;
+  }
+
+  /* ---------- Desktop: Karte links, Orte rechts (Dropdown), volle Content-Breite ---------- */
+  @media (min-width: 641px) {
+    .places__board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 32rem);
+      gap: clamp(1.25rem, 3.5vw, 3.5rem);
+      align-items: stretch;
+      width: 100%;
+      max-width: none;
+    }
+
+    /* Höhe der Zeile = Karten-Seitenverhältnis; Liste füllt dieselbe Höhe, scrollt bei Bedarf */
+    .places__map {
+      position: sticky;
+      top: calc(4.25rem + env(safe-area-inset-top, 0px) + 0.75rem);
+      width: 100%;
+      aspect-ratio: 1000 / 520;
+      padding: 0;
+      background: none;
+    }
+
+    .places__map :global(.map) {
+      height: 100%;
+    }
+
+    .places__map :global(.map__svg) {
+      width: 100%;
+      height: 100%;
+    }
+
+    .places__list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      height: 0;
+      min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Akkordeon: geschlossen = nur Summary, offen = Rest der Kartenhöhe */
+    .place {
+      display: flex;
+      flex: 0 0 auto;
+      min-height: 0;
+      scroll-margin-top: calc(4.25rem + env(safe-area-inset-top, 0px));
+      width: 100%;
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .place:has(.place__card[open]) {
+      flex: 1 1 0;
+      min-height: 0;
+    }
+
+    .place__card {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 0;
+    }
+
+    .place:has(.place__card[open]) .place__card {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .place__card[open] .place__body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .place__top {
+      cursor: pointer;
+    }
+
+    .place__name {
+      font-size: clamp(1.0625rem, 1.15vw, 1.3125rem);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .places__board {
+      grid-template-columns: minmax(0, 1.35fr) minmax(20rem, 26rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .place,
+    .place__card::after,
+    .place__num,
+    .place__num::before,
+    .place__chev,
+    .place__arrow {
+      transition: none;
+    }
+
+    .place__link:hover .place__arrow,
+    .place__link:focus-visible .place__arrow {
+      transform: none;
+    }
+  }
+</style>

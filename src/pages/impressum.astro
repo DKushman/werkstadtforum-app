@@ -1,0 +1,38 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base
+  title="Impressum – WerkStadtForum"
+  description="Hinweis zum Impressum des WerkStadtForums. Der vollständige Text folgt."
+>
+  <main class="legal">
+    <h1>Impressum</h1>
+    <p>Das Impressum steht noch nicht. Dieser Hinweis ist ein Platzhalter.</p>
+    <p><a href="/">Zur Startseite</a></p>
+  </main>
+</Base>
+
+<style>
+  .legal {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 8vh, 4rem) var(--gutter);
+  }
+
+  .legal h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .legal p {
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .legal a:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+  }
+</style>

@@ -1,0 +1,169 @@
+/*
+ * Motion der Hero-Illustration.
+ *
+ * Jedes bewegte Objekt ist eine eigene kleine <svg>-Ebene (siehe scripts/build-scene.ts).
+ * Dauer-Animationen laufen ausschließlich über `transform` dieser Ebenen – das läuft auf dem
+ * Compositor (GPU) ohne Style-Recalc oder Repaint im Main-Thread. Das einmalige Intro (pop)
+ * nutzt die separate Eigenschaft `scale`, damit es sich nicht mit `transform` überschreibt.
+ * Bewegungswerte (--tx, --hop, …) sind vom Build in % der jeweiligen Ebene umgerechnet,
+ * Drehpunkte (transform-origin) stehen inline an jeder Ebene.
+ */
+
+/* ---------- Augen (Position setzt src/scripts/hero.ts) ---------- */
+
+.scene__base .eye {
+  transform-box: view-box;
+  transition: translate 0.35s var(--ease-out);
+}
+
+/* ---------- Intro: Gegenstände & Konfetti ploppen auf ---------- */
+
+@keyframes pop {
+  from {
+    scale: 0;
+  }
+}
+
+/* ---------- Stifte ---------- */
+
+.fx--roll {
+  animation:
+    pop 0.7s var(--ease-bounce) var(--pd) both,
+    roll var(--t) ease-in-out var(--d) infinite alternate;
+}
+
+@keyframes roll {
+  to {
+    transform: translate(var(--tx), var(--ty)) rotate(var(--r));
+  }
+}
+
+/* ---------- Kugelschreiber ---------- */
+
+.fx--wobble {
+  animation:
+    pop 0.7s var(--ease-bounce) var(--pd) both,
+    wobble var(--t) ease-in-out var(--d) infinite alternate;
+}
+
+@keyframes wobble {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(2deg);
+  }
+}
+
+/* ---------- Münzen ---------- */
+
+.fx--hop {
+  animation:
+    pop 0.7s var(--ease-bounce) var(--pd) both,
+    hop var(--t) linear var(--d) infinite;
+}
+
+@keyframes hop {
+  0%,
+  82%,
+  92%,
+  98%,
+  100% {
+    transform: translateY(0);
+    animation-timing-function: ease-out;
+  }
+  87% {
+    transform: translateY(calc(var(--hop) * -1));
+    animation-timing-function: ease-in;
+  }
+  95% {
+    transform: translateY(calc(var(--hop) * -0.34));
+    animation-timing-function: ease-in;
+  }
+}
+
+/* ---------- Zirkel ---------- */
+
+.fx--swing {
+  animation: swing 3.8s ease-in-out -0.6s infinite alternate;
+}
+
+@keyframes swing {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+/* ---------- Kaffeedampf ---------- */
+
+.fx--steam {
+  animation: steam 2.4s ease-in-out var(--d) infinite alternate;
+}
+
+@keyframes steam {
+  from {
+    transform: skewX(-6deg) scaleY(0.95);
+  }
+  to {
+    transform: skewX(6deg) scaleY(1.04);
+  }
+}
+
+/* ---------- Wolken ---------- */
+
+.fx--drift {
+  animation: drift var(--t) ease-in-out var(--d) infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(calc(var(--dx) * -1.5));
+  }
+  to {
+    transform: translateX(calc(var(--dx) * 1.5));
+  }
+}
+
+/* ---------- Konfetti ---------- */
+
+/* Ebenen sind nur wenige Pixel groß – Ausschläge daher als Vielfaches von --fy */
+.fx--float {
+  animation:
+    pop 0.6s var(--ease-bounce) var(--pd) both,
+    float var(--t) ease-in-out var(--d) infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(calc(var(--fy) * -1.5), calc(var(--fy) * 3)) rotate(40deg);
+  }
+  50% {
+    transform: translate(0, calc(var(--fy) * 5)) rotate(90deg);
+  }
+  75% {
+    transform: translate(calc(var(--fy) * 1.5), calc(var(--fy) * 3)) rotate(140deg);
+  }
+}
+
+/* ---------- Pausieren, wenn der Hero nicht sichtbar ist (IntersectionObserver) ---------- */
+
+.hero.is-offscreen .fx,
+.hero.is-offscreen .rotator__track {
+  animation-play-state: paused;
+}
+
+/* ---------- Reduzierte Bewegung: nur die Augen bleiben ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .fx {
+    animation: none !important;
+  }
+}
+
