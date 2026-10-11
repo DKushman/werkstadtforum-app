@@ -151,18 +151,19 @@ const socials = [
     color: var(--beige);
   }
 
+  /* Mobil: Footer fixed, wird nur durch Scroll aufgedeckt (reines CSS, kein Parallax-JS) */
   @media (max-width: 719px) {
     :global(.page-sheet) {
-      margin-bottom: 0;
+      margin-bottom: calc(var(--footer-reveal) - var(--footer-overlap));
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
 
     .site-footer {
-      position: relative;
-      z-index: 1;
-      height: auto;
-      overflow: visible;
+      position: fixed;
+      z-index: 0;
+      height: var(--footer-reveal);
+      overflow: hidden;
       transform: none;
       visibility: visible;
     }

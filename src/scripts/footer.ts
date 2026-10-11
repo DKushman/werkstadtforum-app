@@ -73,6 +73,7 @@ if (footer && sheet) {
       return;
     }
 
+    /* Kein Scroll-Tracking: Footer liegt fixed dahinter, Inhalt scrollt darüber */
     footer.inert = false;
     footer.classList.remove("is-revealed");
   };

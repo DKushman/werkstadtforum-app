@@ -394,6 +394,18 @@ const ways = [
     border-radius: 0 0 clamp(1.75rem, 3.2vw, 2.5rem) clamp(1.75rem, 3.2vw, 2.5rem);
   }
 
+  @media (max-width: 719px) {
+    .sponsors {
+      margin-bottom: 0;
+      border-radius: 0;
+      transition: border-radius 0.55s var(--ease-out);
+    }
+
+    .sponsors.is-seen {
+      border-radius: 0 0 clamp(2.75rem, 6vw, 4.75rem) clamp(2.75rem, 6vw, 4.75rem);
+    }
+  }
+
   .sponsors__label {
     margin: 0 0 clamp(0.85rem, 2vh, 1.25rem);
     color: var(--text);
@@ -472,6 +484,11 @@ const ways = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .sponsors.is-seen {
+      border-radius: 0 0 clamp(2.75rem, 6vw, 4.75rem) clamp(2.75rem, 6vw, 4.75rem);
+      transition: none;
+    }
+
     .sponsors__marquee {
       -webkit-mask-image: none;
       mask-image: none;
