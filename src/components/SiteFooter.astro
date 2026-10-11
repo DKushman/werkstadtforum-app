@@ -152,20 +152,19 @@ const socials = [
   }
 
   @media (max-width: 719px) {
-    .site-footer {
-      visibility: hidden;
-      transform: translateY(100%);
-      transition:
-        transform 0.55s var(--ease-out),
-        visibility 0s linear 0.55s;
+    :global(.page-sheet) {
+      margin-bottom: 0;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
 
-    .site-footer.is-revealed {
+    .site-footer {
+      position: relative;
+      z-index: 1;
+      height: auto;
+      overflow: visible;
+      transform: none;
       visibility: visible;
-      transform: translateY(0);
-      transition:
-        transform 0.55s var(--ease-out),
-        visibility 0s;
     }
   }
 
