@@ -134,33 +134,25 @@ if (root) {
     return { x: node.x, y: node.top + inset };
   };
 
-  const buildLegsMobile = (nodes: Disc[]) => {
-    const [a, b, c, d] = nodes;
-    const out = ["", "", "", ""];
-    if (a) out[0] = b ? legThrough(a, b, "left") : legThrough(a, null, "left");
-    if (b) out[1] = c ? legThrough(b, c, "top") : legThrough(b, null, "top");
-    if (c) out[2] = d ? legThrough(c, d, "left") : legThrough(c, null, "left");
-    if (d) out[3] = "";
-    return out;
-  };
+  const hintFor = (i: number): "left" | "top" => (i % 2 === 0 ? "left" : "top");
+
+  const buildLegsMobile = (nodes: Disc[]) =>
+    nodes.map((node, i) => (i < nodes.length - 1 ? legThrough(node, nodes[i + 1], hintFor(i)) : ""));
 
   const buildLegsDesktop = (nodes: Disc[], tail: CardPt[]) => {
-    const [a, b, c, d] = nodes;
-    const out = ["", "", "", ""];
     const legFrom = (node: Disc, next: Point | null, arrive: "left" | "top") => {
       let dPath = `M ${node.x.toFixed(1)} ${node.y.toFixed(1)}` + lineTo({ x: node.x, y: node.bottom });
       if (next) dPath += arc({ x: node.x, y: node.bottom }, next, arrive);
       return dPath;
     };
-    if (a) out[0] = legFrom(a, b ? dock(b, "left") : null, "left");
-    if (b) out[1] = legFrom(b, c ? dock(c, "top") : null, "top");
-    if (c) out[2] = legFrom(c, d ? dock(d, "left") : null, "left");
-    if (d) {
-      const exit = { x: d.x, y: d.bottom };
-      out[3] =
-        `M ${d.x.toFixed(1)} ${d.y.toFixed(1)}` + lineTo(exit) + buildDesktopTail(exit, tail);
-    }
-    return out;
+    return nodes.map((node, i) => {
+      if (i < nodes.length - 1) {
+        const hint = hintFor(i);
+        return legFrom(node, dock(nodes[i + 1], hint), hint);
+      }
+      const exit = { x: node.x, y: node.bottom };
+      return `M ${node.x.toFixed(1)} ${node.y.toFixed(1)}` + lineTo(exit) + buildDesktopTail(exit, tail);
+    });
   };
 
   const layoutLine = () => {
@@ -243,15 +235,31 @@ if (root) {
     return clamp((start - anchor) / Math.max(1, span));
   };
 
-  const lastLegDraw = (lineFrom: number, lineP: number) => {
-    if (lineP < lineFrom) return 0;
-    const scrollP = clamp((lineP - lineFrom) / Math.max(0.001, 1 - lineFrom));
-    if (!mitmachenGrid) return smoothstep(scrollP);
+  /** Letzter Abschnitt (Tail in die Mitmachen-Karten): direkt an die letzte Scheibe gekoppelt.
+      Start, sobald ihre Mitte bei 85 % der Viewport-Höhe ist; die Spitze läuft dann knapp
+      unter dem unteren Rand voraus und erreicht die Karten-Mitte, bevor diese in der Bildmitte ist. */
+  const orbCenter = (i: number) => {
+    const orb = stops[i]?.querySelector<HTMLElement>(".stop__orb");
+    if (!orb) return null;
+    const o = orb.getBoundingClientRect();
+    return o.top + o.height * 0.5;
+  };
 
+  /* Abschnitt in die letzte Station: zügig, fertig sobald deren Scheibe bei 75 % der Viewport-Höhe ist.
+     Start, wenn die vorletzte Scheibe bei 80 % ist. */
+  const intoLastDraw = (c4: number, c5: number) => {
     const vh = window.innerHeight;
-    const gridBox = mitmachenGrid.getBoundingClientRect();
-    const gridP = clamp((vh * 0.84 - gridBox.top) / Math.max(1, gridBox.height + vh * 0.42));
-    return smoothstep(Math.max(scrollP, gridP));
+    return clamp((vh * 0.8 - c4) / Math.max(1, c5 - c4 + vh * 0.05));
+  };
+
+  /** Letzter Abschnitt (Tail in die Mitmachen-Karten): erst, wenn der vorige komplett ist.
+      Start bei Scheibenmitte auf 70 % der Viewport-Höhe, dann läuft die Spitze voraus. */
+  const lastLegDraw = (c5: number) => {
+    if (!mitmachenGrid) return 0;
+    const vh = window.innerHeight;
+    const g = mitmachenGrid.getBoundingClientRect();
+    const span = Math.max(1, g.top + g.height * 0.5 - c5);
+    return smoothstep((vh * 0.7 - c5) / (span * 0.8));
   };
 
   const updateProgress = () => {
@@ -259,17 +267,18 @@ if (root) {
     const p = scrollProgress(trail?.offsetHeight ?? 1);
     const lineP = scrollProgress((trail?.offsetHeight ?? 1) * 1.55, 0.78);
     const step = 1 / (n + 1);
-    const lastLineFrom = (n - 1 + 0.28) * step;
+    const cPrev = n > 1 ? orbCenter(n - 2) : null;
+    const cLast = orbCenter(n - 1);
+    const intoLast = cPrev !== null && cLast !== null ? intoLastDraw(cPrev, cLast) : 0;
 
     for (let i = 0; i < n; i++) {
       const popAt = (i + 0.12) * step;
       const lineFrom = (i + 0.28) * step;
       const lineTo = i === n - 1 ? 1 : (i + 1) * step;
       if (p >= popAt) revealStop(i);
-      const local =
-        i === n - 1 && !mobileLayout
-          ? lastLegDraw(lastLineFrom, lineP)
-          : clamp((lineP - lineFrom) / Math.max(0.001, lineTo - lineFrom));
+      let local = clamp((lineP - lineFrom) / Math.max(0.001, lineTo - lineFrom));
+      if (i === n - 2) local = Math.max(local, intoLast);
+      if (i === n - 1 && !mobileLayout) local = intoLast >= 1 && cLast !== null ? lastLegDraw(cLast) : 0;
       legs[i]?.style.setProperty("--draw", (1 - local).toFixed(4));
     }
   };
@@ -288,15 +297,23 @@ if (root) {
   } else {
     root.classList.add("is-armed");
     let ticking = false;
+    // Scroll-Arbeit nur, solange Stationen oder Mitmachen-Karten (plus Vorlauf) im Viewport sind
+    let near = false;
     const onScroll = () => {
-      if (ticking) return;
+      if (ticking || !near) return;
       ticking = true;
       requestAnimationFrame(() => {
         ticking = false;
         updateProgress();
       });
     };
-    updateProgress();
+    new IntersectionObserver(
+      ([entry]) => {
+        near = entry.isIntersecting;
+        if (near) onScroll();
+      },
+      { rootMargin: "25% 0px" },
+    ).observe(bridge ?? root);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", scheduleLayout, { passive: true });
   }

@@ -1,23 +1,23 @@
 ---
 const goals = [
   {
-    value: 3,
+    value: 2040,
     suffix: "",
-    unitLine: "Minuten",
     locale: false,
-    text: "So oft fährt der Bus auf Ku’damm und Kantstraße.",
-    accent: "var(--logo-blue)",
-    bg: "#e8f4fc",
-    fg: "var(--green)",
-  },
-  {
-    value: 50,
-    suffix: " %",
-    locale: false,
-    text: "weniger Parkplätze in den Seitenstraßen. Der Platz geht an Fuß und Rad.",
+    static: true,
+    text: "klimaneutral. Zehn Jahre früher als ganz Berlin.",
     accent: "var(--logo-purple)",
     bg: "var(--yellow-light)",
     fg: "var(--green)",
+  },
+  {
+    value: 20000,
+    suffix: "",
+    locale: true,
+    text: "neue Wohnungen bis 2040.",
+    accent: "var(--yellow)",
+    bg: "var(--green)",
+    fg: "var(--forum-text)",
   },
   {
     value: 80,
@@ -29,14 +29,25 @@ const goals = [
     fg: "#0f5c42",
   },
   {
-    value: 20000,
+    value: 3,
     suffix: "",
-    locale: true,
-    text: "neue Wohnungen bis 2040.",
-    accent: "var(--yellow)",
-    bg: "var(--green)",
-    fg: "var(--forum-text)",
+    unitLine: "Minuten",
+    locale: false,
+    text: "So oft fährt der Bus auf Ku’damm und Kantstraße.",
+    accent: "var(--logo-blue)",
+    bg: "#e8f4fc",
+    fg: "var(--green)",
   },
+] as const;
+
+// Themen der Charta als Chips (Anker auf der Charta-Seite)
+const themes = [
+  { id: "mobilitaet", label: "Mobilität & Digitales" },
+  { id: "klima", label: "Klima & Grün" },
+  { id: "wohnen", label: "Wohnen & Zusammenleben" },
+  { id: "wirtschaft", label: "Handel, Arbeit & Wissen" },
+  { id: "kultur", label: "Kultur & Nachtleben" },
+  { id: "staedtebau", label: "Städtebau & Plätze" },
 ] as const;
 ---
 
@@ -68,9 +79,10 @@ const goals = [
                   data-value={g.value}
                   data-suffix={g.suffix}
                   data-locale={g.locale ? "true" : "false"}
+                  data-static={"static" in g && g.static ? "true" : undefined}
                   aria-hidden="true"
                 >
-                  0{g.suffix}
+                  {"static" in g && g.static ? g.value : `0${g.suffix}`}
                 </span>
                 {"unitLine" in g && g.unitLine ? (
                   <>
@@ -92,17 +104,27 @@ const goals = [
       ))
     }
     <div class="charta__step" aria-hidden="true"></div>
-    <a
-      href="#charta-ziele"
+    <div
       class="charta__card charta__card--link"
       role="listitem"
       style="--i: 4; --card-bg: var(--pill-bg); --card-fg: var(--green); --accent: var(--green)"
     >
       <div class="charta__card-inner charta__card-inner--link">
-        <p class="charta__link-title">Alle Ziele sehen</p>
-        <p class="charta__text">Die komplette Charta 2040 mit allen 79 Zielen.</p>
+        <a class="charta__link-title" href="/charta#ziele">Alle 79 Ziele entdecken</a>
+        <p class="charta__text">Die komplette Charta 2040, nach sechs Themen sortiert.</p>
+        <ul class="charta__chips" aria-label="Themen der Charta">
+          {
+            themes.map((t) => (
+              <li>
+                <a class="charta__chip" href={`/charta#${t.id}`}>
+                  {t.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-    </a>
+    </div>
     <div class="charta__tail" aria-hidden="true"></div>
   </div>
 </section>
@@ -119,6 +141,7 @@ const goals = [
   }
 
   .charta {
+    padding-block: 0;
     --top-safe: calc(4.5rem + env(safe-area-inset-top, 0px));
     --bottom-safe: clamp(1.25rem, 3.5vh, 2.25rem);
     --stack-inset: clamp(1.25rem, 3vh, 2rem);
@@ -298,7 +321,39 @@ const goals = [
     gap: clamp(0.65rem, 1.6vh, 1rem);
   }
 
+  .charta__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .charta__chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.85rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px rgb(27 74 20 / 0.3);
+    color: var(--green);
+    font-size: clamp(0.8125rem, 1vw, 0.9375rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  }
+
+  .charta__chip:hover,
+  .charta__chip:focus-visible {
+    background: var(--green);
+    color: var(--beige);
+  }
+
   .charta__link-title {
+    display: block;
+    text-decoration: none;
     margin: 0;
     color: var(--card-fg);
     font-size: clamp(2rem, 9vw, 3.75rem);

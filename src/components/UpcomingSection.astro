@@ -32,12 +32,13 @@ const rawEvents = [
     date: "2026-11-12",
     datetime: "2026-11-12T18:00:00+01:00",
     dateLabel: "Do, 12. Nov. · 18 Uhr",
-    title: "WerkStadtForum #12: Wem gehört der Ku’damm?",
+    title: "Nächstes Forum vor Ort: Wem gehört der Ku’damm?",
     venue: "Europa-Center, Tauentzienstraße 11",
-    href: "#platz-sichern",
+    note: "auf Einladung",
+    href: "/foren-ergebnisse",
     image: terminImg,
     alt: "Besucherinnen und Besucher bei einer Veranstaltung in Berlin",
-    cta: "Platz sichern",
+    cta: "Ergebnisse ansehen",
   },
 ].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -96,7 +97,9 @@ const events = rawEvents.map((e, i) => ({
               <h3 class="upcoming-card__title">{item.title}</h3>
               {item.kind === "termin" && (
                 <>
-                  <span class="upcoming-card__venue">{item.venue}</span>
+                  <span class="upcoming-card__venue">
+                    {item.venue} <span class="upcoming-card__note">{item.note}</span>
+                  </span>
                   <span class="cta cta--nachrichten upcoming-card__cta">{item.cta}</span>
                 </>
               )}
@@ -108,7 +111,7 @@ const events = rawEvents.map((e, i) => ({
   </ol>
 
   <div class="upcoming__more">
-    <PillLink href="#alle-nachrichten" label="Alle Nachrichten" variant="on-beige" />
+    <PillLink href="/foren-ergebnisse" label="Alle Foren & Ergebnisse" variant="on-beige" />
   </div>
 </section>
 
@@ -117,6 +120,18 @@ const events = rawEvents.map((e, i) => ({
 </script>
 
 <style>
+  .upcoming-card__note {
+    display: inline-block;
+    margin-left: 0.35em;
+    padding: 0.05em 0.5em 0.1em;
+    border-radius: 999px;
+    background: rgb(27 74 20 / 0.1);
+    color: var(--green);
+    font-size: 0.8em;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
   .upcoming {
     position: relative;
     padding: clamp(3rem, 9vh, 5.5rem) var(--gutter) clamp(3.5rem, 10vh, 6rem);

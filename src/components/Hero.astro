@@ -12,7 +12,7 @@ const words = ["planen", "bauen", "gestalten"];
 const sheetFirst =
   "Wir bringen alle an einen Tisch, bevor über die City West entschieden wird.";
 const sheetRest =
-  "Nachbarn, Planerinnen, Händler, Kultur und Politik. Gemeinsam klären wir, wie unser Stadtteil in Zukunft aussehen soll.";
+  "Politik, Verwaltung, Eigentümer, Handel und Kultur bei den Foren vor Ort. Und alle anderen online im Forum.";
 ---
 
 <div class="hero-pin" id="hero-pin">
@@ -54,10 +54,12 @@ const sheetRest =
   <section class="sheet" id="hero-sheet" aria-labelledby="sheet-heading">
     <div class="sheet__content">
       <p class="sheet__lead" id="sheet-heading">
-        <strong class="sheet__lead-strong">{sheetFirst}</strong>{" "}
-        <span class="sheet__lead-rest">{sheetRest}</span>
+        <span class="sheet__lead-in">
+          <strong class="sheet__lead-strong">{sheetFirst}</strong>{" "}
+          <span class="sheet__lead-rest">{sheetRest}</span>
+        </span>
       </p>
-      <PillLink href="#" label="Mehr zu uns" />
+      <PillLink href="/worum-gehts" label="Mehr zu uns" />
     </div>
   </section>
 </div>
@@ -115,6 +117,7 @@ const sheetRest =
   }
 
   .sheet {
+    padding-block: 0;
     z-index: 3;
     border-radius: clamp(1.5rem, 3.2vw, 2.75rem) clamp(1.5rem, 3.2vw, 2.75rem) 0 0;
     background: var(--sheet);
@@ -122,6 +125,8 @@ const sheetRest =
   }
 
   .sheet__content {
+    position: relative;
+    z-index: 5;
     pointer-events: auto;
     width: 100%;
     max-width: none;
@@ -130,13 +135,23 @@ const sheetRest =
   }
 
   .sheet__lead {
-    max-width: min(56rem, 68vw);
+    max-width: min(52rem, 64vw);
     margin: 0 0 clamp(1.35rem, 3.2vh, 2.25rem);
-    font-size: clamp(1.65rem, 3.35vw, 3.15rem);
+    overflow: hidden;
+    font-size: clamp(1.55rem, 3.2vw, 2.85rem);
     font-weight: 600;
-    line-height: 1.04;
-    letter-spacing: -0.045em;
+    line-height: 1.06;
+    letter-spacing: -0.04em;
     color: var(--green);
+  }
+
+  .sheet__lead-in {
+    display: block;
+    transform: translateY(110%);
+  }
+
+  .sheet.is-revealed .sheet__lead-in {
+    animation: line-in 0.85s var(--ease-out) both;
   }
 
   .sheet__lead-strong {
@@ -252,6 +267,9 @@ const sheetRest =
   @keyframes line-in {
     from {
       transform: translateY(110%);
+    }
+    to {
+      transform: none;
     }
   }
 
@@ -449,14 +467,16 @@ const sheetRest =
     }
 
     .sheet__content {
+      position: sticky;
+      top: calc(var(--mobile-nav) + max(0.65rem, env(safe-area-inset-top, 0px)) + 0.35rem);
       max-width: none;
       padding: clamp(1.5rem, 5vw, 2rem) var(--gutter) clamp(1.25rem, 4vw, 1.75rem);
     }
 
     .sheet__lead {
-      max-width: min(36rem, 96vw);
-      font-size: clamp(1.45rem, 6.2vw, 2.05rem);
-      line-height: 1.02;
+      max-width: min(34rem, 96vw);
+      font-size: clamp(1.42rem, 6.1vw, 2.05rem);
+      line-height: 1.04;
       margin-bottom: clamp(1.15rem, 4vw, 1.65rem);
     }
 
@@ -561,8 +581,14 @@ const sheetRest =
 
     .line__in,
     .hero__subline-in,
+    .sheet__lead-in,
     .rotator__track,
     .scene {
+      animation: none;
+      transform: none;
+    }
+
+    .sheet.is-revealed .sheet__lead-in {
       animation: none;
     }
 
@@ -576,7 +602,7 @@ const sheetRest =
 
     @media (min-width: 641px) {
       .sheet {
-        transform: translateY(100%);
+        transform: none;
       }
     }
 

@@ -1,0 +1,70 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import PageHero from "../components/PageHero.astro";
+import PillLink from "../components/PillLink.astro";
+import MitSchritteSection from "../components/MitSchritteSection.astro";
+import MitWissenSection from "../components/MitWissenSection.astro";
+import MitmachenSection from "../components/MitmachenSection.astro";
+import ForumBridgeLine from "../components/ForumBridgeLine.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import grandpa from "../assets/hero/grandpa.webp";
+import student from "../assets/hero/student.webp";
+import aktiv from "../assets/hero/aktiv.webp";
+
+const title = "Mitmachen – WerkStadtForum";
+const description =
+  "Im Online-Forum redest du mit, wenn es um die Zukunft der City West geht. Lesen ohne Anmeldung, abstimmen und kommentieren mit kurzer Anmeldung.";
+const lead =
+  "Im Online-Forum redest du mit, wenn es um die Zukunft der City West geht. Egal, ob du hier wohnst, arbeitest oder einfach gern unterwegs bist.";
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Mitmachen",
+  description,
+  url: canonical.href,
+  inLanguage: "de-DE",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "WerkStadtForum",
+    url: Astro.site?.href ?? "https://werkstadtforum.de/",
+  },
+};
+---
+
+<Base title={title} description={description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+  <Nav />
+  <div class="page-sheet">
+    <main>
+      <PageHero
+        title={["Mitmachen"]}
+        sub="Deine Meinung. Bevor entschieden wird."
+        lead={lead}
+        group={[grandpa, student, aktiv]}
+      >
+        <Fragment slot="actions">
+          <PillLink href="/forum" label="Zum Forum" variant="on-beige" />
+        </Fragment>
+        <MitSchritteSection slot="sheet" />
+      </PageHero>
+      <div class="forum-bridge mit-bridge" data-worum-bridge style="--bridge-color: #5a3e32">
+        <ForumBridgeLine />
+        <MitWissenSection />
+        <MitmachenSection />
+      </div>
+    </main>
+  </div>
+  <SiteFooter />
+</Base>
+
+<style>
+  /* „Gut zu wissen“ schließt nahtlos an die braune Schritte-Fläche an */
+  .mit-bridge {
+    padding-top: 0;
+  }
+</style>

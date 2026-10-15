@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "scene": "bun scripts/build-scene.ts",
+    "heads": "bun scripts/prepare-heads.ts",
+    "hero-figures": "bun scripts/prepare-hero-figures.ts",
     "build": "bun scripts/build-scene.ts && bun scripts/fetch-upcoming-images.ts && astro build",
     "upcoming:images": "bun scripts/fetch-upcoming-images.ts",
     "preview": "astro preview",

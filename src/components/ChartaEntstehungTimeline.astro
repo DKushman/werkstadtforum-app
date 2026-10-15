@@ -1,0 +1,400 @@
+---
+const steps = [
+  {
+    when: "September 2019",
+    what: "Das erste WerkStadtForum. Fachleute, Politik und Akteure der City West setzen sich an einen Tisch.",
+  },
+  { when: "Mai 2020", what: "Die erste Fassung der Charta ist fertig." },
+  {
+    when: "28. Mai bis 31. Juli 2020",
+    what: "Die Charta steht online auf mein.Berlin.de. Alle können Kapitel kommentieren und Ideen bewerten.",
+  },
+  {
+    when: "Zweite Hälfte 2020",
+    what: "Drei Veranstaltungen zu Mobilität, Stadtökologie und dem Leitbild. Die Ergebnisse fließen in die nächste Fassung.",
+  },
+  { when: "Heute", what: "Kuratorium und Moderation schreiben die Charta weiter.", now: true },
+] as const;
+---
+
+<section class="entstehung" id="entstehung" aria-labelledby="entstehung-title">
+  <h2 class="entstehung__title" id="entstehung-title">Nicht am Schreibtisch erfunden.</h2>
+
+  <div class="tl">
+    <!-- Linie: gestrichelte Spur + grüne Füllung, die beim Scrollen mitwächst.
+         Reines CSS (scroll-driven, nur transform) – kein Script. -->
+    <div class="tl__track" aria-hidden="true">
+      <svg class="tl__svg tl__svg--base" viewBox="0 0 8 100" preserveAspectRatio="none" focusable="false">
+        <line x1="4" y1="0" x2="4" y2="100" vector-effect="non-scaling-stroke" />
+      </svg>
+      <div class="tl__mask">
+        <div class="tl__fill">
+          <svg class="tl__svg tl__svg--fill" viewBox="0 0 8 100" preserveAspectRatio="none" focusable="false">
+            <line x1="4" y1="0" x2="4" y2="100" vector-effect="non-scaling-stroke" />
+          </svg>
+        </div>
+      </div>
+      <div class="tl__tip"><span class="tl__tip-dot"></span></div>
+    </div>
+
+    <ol class="tl__list">
+      {
+        steps.map((step, i) => (
+          <li class:list={["tl__item", "now" in step && step.now && "tl__item--now"]} style={`--i: ${i}`}>
+            <span class="tl__dot" aria-hidden="true" />
+            <div class="tl__card">
+              <h3 class="tl__when">{step.when}</h3>
+              <p class="tl__what">{step.what}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <a class="entstehung__link" href="/worum-gehts">
+    Wie das WerkStadtForum arbeitet
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M3.5 8h8.2M8.8 4.8 12.2 8l-3.4 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </a>
+</section>
+
+<style>
+  .entstehung {
+    --line-x: 0.85rem;
+    --line-w: 6px;
+    --dot: 1.35rem;
+    --tip: 1.1rem;
+    position: relative;
+    padding-inline: var(--gutter);
+    color: var(--green);
+    /* Verlauf: Beige → helles Grün → Beige, nahtlos an die Nachbarn */
+    background: linear-gradient(180deg, var(--beige) 0%, #e4f4d8 26%, #cdeebd 62%, var(--beige) 100%);
+  }
+
+  .entstehung__title {
+    max-width: 14ch;
+    margin: 0;
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  /* ——— Zeitstrahl ——— */
+  .tl {
+    position: relative;
+    max-width: 68rem;
+    margin: clamp(2rem, 6vh, 3.5rem) auto 0;
+  }
+
+  .tl__track {
+    position: absolute;
+    top: calc(var(--dot) / 2 + 0.35rem);
+    bottom: 0;
+    left: var(--line-x);
+    width: var(--line-w);
+    transform: translateX(-50%);
+    view-timeline: --tl block;
+  }
+
+  /* Linie läuft unten aus: es geht weiter (statische Maske auf den Linien selbst) */
+  .tl__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 6rem), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 6rem), transparent);
+  }
+
+  .tl__svg line {
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .tl__svg--base line {
+    stroke: rgb(27 74 20 / 0.25);
+    stroke-width: 3px;
+    stroke-dasharray: 2 9;
+  }
+
+  .tl__svg--fill line {
+    stroke: var(--green);
+    stroke-width: var(--line-w);
+  }
+
+  /* Wisch nach unten: Maske fährt von −100 % auf 0, Füllung gegenläufig –
+     die Linie selbst steht still, nur die Kante wandert. Beides nur transform. */
+  .tl__mask {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .tl__fill {
+    position: absolute;
+    inset: 0;
+  }
+
+  .tl__tip {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .tl__tip-dot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: var(--tip);
+    height: var(--tip);
+    border: 3px solid var(--green);
+    border-radius: 50%;
+    background: var(--beige);
+    transform: translate(-50%, 50%);
+    opacity: 0;
+  }
+
+  /* ——— Einträge ——— */
+  .tl__list {
+    display: grid;
+    gap: clamp(2rem, 6vh, 3.25rem);
+    margin: 0;
+    padding: 0 0 clamp(3rem, 9vh, 5rem);
+    list-style: none;
+  }
+
+  .tl__item {
+    position: relative;
+    padding-left: calc(var(--line-x) + var(--dot) / 2 + clamp(1rem, 3vw, 1.5rem));
+  }
+
+  .tl__dot {
+    position: absolute;
+    top: 0.35rem;
+    left: var(--line-x);
+    width: var(--dot);
+    height: var(--dot);
+    border: 4px solid var(--beige);
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 2px var(--green);
+    transform: translateX(-50%);
+  }
+
+  .tl__item--now .tl__dot {
+    background: var(--beige);
+    box-shadow: 0 0 0 3px var(--green);
+  }
+
+  .tl__when {
+    margin: 0;
+    font-size: clamp(1.6rem, 6vw, 2.75rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .tl__item--now .tl__when {
+    display: inline-block;
+    padding: 0.04em 0.28em 0.1em;
+    border-radius: 0.18em;
+    background: var(--green);
+    color: var(--forum-text);
+  }
+
+  .tl__what {
+    max-width: 30rem;
+    margin: 0.6rem 0 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.3vw, 1.175rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.012em;
+    text-wrap: pretty;
+  }
+
+  .entstehung__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    color: var(--green);
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  .entstehung__link svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: transform 0.35s var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .entstehung__link:hover svg {
+      transform: translate3d(0.25rem, 0, 0);
+    }
+  }
+
+  /* ——— Desktop: Linie mittig, Einträge abwechselnd links/rechts ——— */
+  @media (min-width: 900px) {
+    .entstehung {
+      --line-x: 50%;
+      --dot: 1.6rem;
+    }
+
+    .entstehung__title {
+      max-width: none;
+      text-align: center;
+    }
+
+    .entstehung__link {
+      display: flex;
+      justify-content: center;
+      width: max-content;
+      margin-inline: auto;
+    }
+
+    .tl__item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: clamp(3rem, 7vw, 6rem);
+      padding-left: 0;
+    }
+
+    .tl__card {
+      grid-column: 1;
+      text-align: right;
+    }
+
+    .tl__card .tl__what {
+      margin-left: auto;
+    }
+
+    .tl__item:nth-child(even) .tl__card {
+      grid-column: 2;
+      text-align: left;
+    }
+
+    .tl__item:nth-child(even) .tl__card .tl__what {
+      margin-left: 0;
+    }
+  }
+
+  /* ——— Scroll-gekoppelte Animationen (nur wo unterstützt; sonst statisch voll) ——— */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Spitze der Linie folgt einer Lesemarke bei 60 % der Viewport-Höhe */
+      .tl__mask {
+        animation: tl-down linear both;
+        animation-timeline: --tl;
+        animation-range: cover 40vh cover calc(100% - 60vh);
+      }
+
+      .tl__tip {
+        animation: tl-tip linear both;
+        animation-timeline: --tl;
+        animation-range: cover 40vh cover calc(100% - 60vh);
+      }
+
+      .tl__fill {
+        animation: tl-up linear both;
+        animation-timeline: --tl;
+        animation-range: cover 40vh cover calc(100% - 60vh);
+      }
+
+      .tl__tip-dot {
+        opacity: 1;
+      }
+
+      /* Punkt springt an, sobald die Lesemarke ihn erreicht */
+      .tl__dot {
+        animation: tl-dot linear both;
+        animation-timeline: view();
+        animation-range: cover 37vh cover 41vh;
+      }
+
+      .tl__card {
+        animation: tl-card linear both;
+        animation-timeline: view();
+        animation-range: cover 22vh cover 42vh;
+      }
+    }
+  }
+
+  @keyframes tl-down {
+    from {
+      transform: translate3d(0, -100%, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* Kopfpunkt läuft mit und verschwindet im Auslauf */
+  @keyframes tl-tip {
+    0% {
+      opacity: 1;
+      transform: translate3d(0, -100%, 0);
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes tl-up {
+    from {
+      transform: translate3d(0, 100%, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes tl-dot {
+    from {
+      opacity: 0.35;
+      transform: translateX(-50%) scale(0.55);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+  }
+
+  @keyframes tl-card {
+    from {
+      opacity: 0.25;
+      transform: translate3d(0, 1rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .entstehung__link svg {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tl__svg--fill line,
+    .tl__dot {
+      stroke: CanvasText;
+      background: CanvasText;
+    }
+  }
+</style>

@@ -1,0 +1,435 @@
+---
+const faqs = [
+  {
+    q: "Kann ich zu den Foren vor Ort kommen?",
+    a: "Die Foren sind für Entscheidungsträger und finden auf Einladung statt. Mitreden kannst du trotzdem: im Online-Forum.",
+  },
+  {
+    q: "Muss ich in der City West wohnen?",
+    a: "Nein. Im Online-Forum kann jeder mitdiskutieren.",
+  },
+  {
+    q: "Muss ich mich mit Stadtplanung auskennen?",
+    a: "Nein. Du kennst deinen Alltag hier. Das reicht.",
+  },
+  {
+    q: "Bringt das überhaupt was?",
+    a: "Ja. Was im Forum diskutiert wird, landet bei den Foren vor Ort. Entscheiden muss am Ende die Politik.",
+  },
+  {
+    q: "Wer schreibt die Beiträge im Forum?",
+    a: "Das Kuratorium. Du stimmst ab und kommentierst.",
+  },
+  {
+    q: "Kann ich anonym mitmachen?",
+    a: "Ja. In deinem Konto stellst du ein, ob dein Name erscheint.",
+  },
+] as const;
+---
+
+<section class="kurz-gefragt" id="kurz-gefragt" aria-labelledby="kurz-gefragt-title">
+  <div class="kurz-gefragt__grid">
+    <div class="kurz-gefragt__side">
+      <h2 class="kurz-gefragt__title" id="kurz-gefragt-title">Kurz gefragt.</h2>
+
+      <!-- Figur auf Scheibe wie die Stationen auf der Startseite; die Linie startet unter der Scheibe -->
+      <div class="kurz-gefragt__figure" aria-hidden="true">
+        <div class="kurz-gefragt__disc" data-bridge-disc></div>
+        <div class="kurz-gefragt__figure-in">
+          <img
+            class="kurz-gefragt__char"
+            src="/characters/denkendergeldmacher.svg"
+            alt=""
+            width="568"
+            height="1076"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="kurz-gefragt__main">
+      <!-- Akkordeon: genau eine Antwort ist offen, alle Antwortfelder sind gleich hoch
+           (--answer-h wird per Script auf die höchste Antwort gesetzt), die Gesamthöhe bleibt konstant -->
+      <ol class="kurz-gefragt__list" data-faq>
+        {
+          faqs.map((item, index) => (
+            <li class:list={["kurz-gefragt__item", index === 0 && "is-open"]}>
+              <h3 class="kurz-gefragt__h">
+                <button
+                  class="kurz-gefragt__summary"
+                  type="button"
+                  id={`faq-q-${index + 1}`}
+                  aria-expanded={index === 0 ? "true" : "false"}
+                  aria-controls={`faq-a-${index + 1}`}
+                >
+                  <span class="kurz-gefragt__num" aria-hidden="true">
+                    {String(index + 1).padStart(3, "0")}
+                  </span>
+                  <span class="kurz-gefragt__question">{item.q}</span>
+                  <span class="kurz-gefragt__toggle" aria-hidden="true" />
+                </button>
+              </h3>
+              <div
+                class="kurz-gefragt__answer"
+                id={`faq-a-${index + 1}`}
+                role="region"
+                aria-labelledby={`faq-q-${index + 1}`}
+                aria-hidden={index === 0 ? "false" : "true"}
+              >
+                <p class="kurz-gefragt__answer-in">{item.a}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="kurz-gefragt__outro">
+        Noch eine Frage?
+        <a class="kurz-gefragt__link" href="/kontakt">Schreib uns →</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Kein z-index auf der Section: die Brückenlinie (z 1) darf hier malen,
+     die Figur (z 3) liegt über der Linie. Keine Stacking-Context-Erzeuger. */
+  .kurz-gefragt {
+    --disc: #5aaf72;
+    --card: #ede8db;
+    --line: rgb(27 74 20 / 0.28);
+    --num-w: 2.1rem;
+    --toggle: 2.25rem;
+    position: relative;
+    padding-inline: var(--gutter);
+    scroll-margin-top: 4.5rem;
+    background: var(--beige);
+    color: var(--text);
+  }
+
+  .kurz-gefragt__grid {
+    display: grid;
+    gap: clamp(1.5rem, 3.5vh, 2.25rem);
+    max-width: 96rem;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  /* --orb: Breite der Figur-Bühne. Die Figur ragt 18 % darüber hinaus,
+     dieser Überstand wird als Abstand unter der Überschrift reserviert. */
+  .kurz-gefragt__side {
+    --orb: clamp(8.5rem, 34vw, 11rem);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .kurz-gefragt__title {
+    margin: 0 0 calc(var(--orb) * 0.18 + 1.25rem);
+    max-width: 10ch;
+    color: var(--green);
+    font-size: clamp(2rem, 8.5vw, 3rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .kurz-gefragt__figure {
+    position: relative;
+    z-index: 3;
+    width: var(--orb);
+    aspect-ratio: 1;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .kurz-gefragt__disc {
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    width: 92%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--disc);
+    transform: translate(-50%, -42%);
+  }
+
+  /* wie .stop__figure auf der Startseite: absolute Bühne, Figur 136 % hoch, mittig */
+  .kurz-gefragt__figure-in {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  .kurz-gefragt__char {
+    display: block;
+    width: auto;
+    height: 136%;
+    max-width: 148%;
+    object-fit: contain;
+  }
+
+  .kurz-gefragt__list {
+    display: grid;
+    gap: clamp(0.65rem, 1.4vh, 0.9rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kurz-gefragt__item {
+    border-radius: clamp(1rem, 2vw, 1.5rem);
+    background: var(--card);
+  }
+
+  .kurz-gefragt__h {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  .kurz-gefragt__summary {
+    display: grid;
+    grid-template-columns: var(--num-w) minmax(0, 1fr) var(--toggle);
+    column-gap: clamp(0.6rem, 1.6vw, 1rem);
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: clamp(1rem, 2.4vh, 1.35rem) clamp(1rem, 2vw, 1.5rem);
+    border: 0;
+    border-radius: inherit;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .kurz-gefragt__summary:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+  }
+
+  .kurz-gefragt__num {
+    color: var(--green);
+    font-size: clamp(0.8125rem, 1.6vw, 0.9375rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
+
+  .kurz-gefragt__question {
+    color: var(--ink);
+    font-size: clamp(1.15rem, 3.4vw, 1.5rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    transition: color 0.25s var(--ease-out);
+  }
+
+  /* Runder Toggle: Plus im Ring, offen: gefüllt dunkelgrün, zum Kreuz gedreht */
+  .kurz-gefragt__toggle {
+    position: relative;
+    width: var(--toggle);
+    height: var(--toggle);
+    border: 1.5px solid var(--line);
+    border-radius: 50%;
+    color: var(--green);
+    transition:
+      transform 0.35s var(--ease-out),
+      background-color 0.25s var(--ease-out),
+      border-color 0.25s var(--ease-out),
+      color 0.25s var(--ease-out);
+  }
+
+  .kurz-gefragt__toggle::before,
+  .kurz-gefragt__toggle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 2px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+  }
+
+  .kurz-gefragt__toggle::before {
+    width: 0.85rem;
+    height: 2px;
+  }
+
+  .kurz-gefragt__toggle::after {
+    width: 2px;
+    height: 0.85rem;
+  }
+
+  .kurz-gefragt__item.is-open .kurz-gefragt__toggle {
+    border-color: var(--green);
+    background: var(--green);
+    color: var(--beige);
+    transform: rotate(45deg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .kurz-gefragt__item:not(.is-open) .kurz-gefragt__summary:hover .kurz-gefragt__question {
+      color: var(--green);
+    }
+
+    .kurz-gefragt__item:not(.is-open) .kurz-gefragt__summary:hover .kurz-gefragt__toggle {
+      border-color: var(--green);
+      background: rgb(27 74 20 / 0.08);
+    }
+
+    .kurz-gefragt__item.is-open .kurz-gefragt__summary:hover .kurz-gefragt__toggle {
+      background: var(--green-light);
+      border-color: var(--green-light);
+    }
+  }
+
+  /* Antwortfeld: zu = 0, offen = einheitliche Höhe (höchste Antwort).
+     Kein Höhen-Übergang, nur der Text blendet ein (opacity/transform). */
+  .kurz-gefragt__answer {
+    height: 0;
+    overflow: hidden;
+  }
+
+  .kurz-gefragt__item.is-open .kurz-gefragt__answer {
+    height: var(--answer-h, auto);
+  }
+
+  .kurz-gefragt__answer-in {
+    margin: 0;
+    padding: 0 clamp(1rem, 2vw, 1.5rem) clamp(1.1rem, 2.6vh, 1.5rem)
+      calc(clamp(1rem, 2vw, 1.5rem) + var(--num-w) + clamp(0.6rem, 1.6vw, 1rem));
+    max-width: 44rem;
+    color: var(--text);
+    font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transform: translate3d(0, -0.3rem, 0);
+  }
+
+  .kurz-gefragt__item.is-open .kurz-gefragt__answer-in {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition:
+      opacity 0.35s var(--ease-out) 0.05s,
+      transform 0.4s var(--ease-out) 0.05s;
+  }
+
+  .kurz-gefragt__outro {
+    margin: clamp(1.25rem, 3vh, 1.75rem) 0 0;
+    padding-left: clamp(1rem, 2vw, 1.5rem);
+    color: var(--text);
+    font-size: clamp(1rem, 2.2vw, 1.0625rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  .kurz-gefragt__link {
+    margin-left: 0.35em;
+    color: var(--green);
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+  }
+
+  .kurz-gefragt__link:hover,
+  .kurz-gefragt__link:focus-visible {
+    color: var(--green-light);
+  }
+
+  @media (min-width: 840px) {
+    .kurz-gefragt__grid {
+      grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+      gap: clamp(2rem, 4vw, 4rem);
+      align-items: stretch;
+    }
+
+    /* Scheibengröße wie .stop__orb auf der Startseite → gleiche Strichstärke der Linie */
+    .kurz-gefragt__side {
+      --orb: min(clamp(11rem, 38vw, 23rem), 100%);
+    }
+
+    .kurz-gefragt__figure {
+      margin-top: auto;
+    }
+
+    .kurz-gefragt__title {
+      font-size: clamp(2.15rem, 3.2vw, 3.25rem);
+    }
+
+    .kurz-gefragt__question {
+      font-size: clamp(1.3rem, 1.65vw, 1.7rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kurz-gefragt__toggle,
+    .kurz-gefragt__question,
+    .kurz-gefragt__item.is-open .kurz-gefragt__answer-in {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .kurz-gefragt__item,
+    .kurz-gefragt__toggle {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>
+
+<script>
+  const list = document.querySelector<HTMLElement>("[data-faq]");
+  if (list) {
+    const items = [...list.querySelectorAll<HTMLElement>(".kurz-gefragt__item")];
+    const buttons = items.map((item) => item.querySelector<HTMLButtonElement>(".kurz-gefragt__summary"));
+
+    /* Einheitliche Antworthöhe: die höchste Antwort bestimmt --answer-h.
+       Die inneren <p> behalten ihre natürliche Höhe, auch wenn das Feld zu ist. */
+    const measure = () => {
+      let max = 0;
+      for (const item of items) {
+        const p = item.querySelector<HTMLElement>(".kurz-gefragt__answer-in");
+        if (p) max = Math.max(max, p.offsetHeight);
+      }
+      list.style.setProperty("--answer-h", `${Math.ceil(max)}px`);
+    };
+
+    const open = (index: number) => {
+      items.forEach((item, i) => {
+        const isOpen = i === index;
+        item.classList.toggle("is-open", isOpen);
+        buttons[i]?.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        item.querySelector(".kurz-gefragt__answer")?.setAttribute("aria-hidden", isOpen ? "false" : "true");
+      });
+    };
+
+    buttons.forEach((button, i) => button?.addEventListener("click", () => open(i)));
+
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+    measure();
+    document.fonts?.ready.then(schedule);
+    addEventListener("resize", schedule, { passive: true });
+  }
+</script>

@@ -11,6 +11,7 @@ const topics = [
     tag: "Mobilität",
     question: "Ku'damm ohne Autos: Traum oder Albtraum?",
     votes: 128,
+    days: 5,
     image: mobilitaet,
     alt: "Menschen flanieren über eine autofreie Straße in der Stadt",
     href: "#diskussion-mobilitaet",
@@ -19,6 +20,7 @@ const topics = [
     tag: "Städtebau",
     question: "Hochhäuser am Breitscheidplatz: Wie hoch ist zu hoch?",
     votes: 94,
+    days: 9,
     image: staedtebau,
     alt: "Hochhäuser am Potsdamer Platz in Berlin vor blauem Himmel",
     href: "#diskussion-staedtebau",
@@ -27,6 +29,7 @@ const topics = [
     tag: "Stadtleben",
     question: "Wo fehlt dir ein Ort, an dem man nichts kaufen muss?",
     votes: 61,
+    days: 12,
     image: stadtleben,
     alt: "Drei Menschen sitzen auf einer Parkbank unter Bäumen",
     href: "#diskussion-stadtleben",
@@ -64,10 +67,12 @@ const topics = [
                   <span class="forum-card__num" data-count={t.votes}>
                     {t.votes}
                   </span>{" "}
-                  Stimmen
+                  Stimmen <span class="forum-card__days">
+                    <span aria-hidden="true">·</span> noch {t.days} Tage
+                  </span>
                 </p>
                 <a class="cta cta--nachrichten forum-card__cta" href={t.href}>
-                  Mitreden<span class="visually-hidden">: {t.question}</span>
+                  Abstimmen<span class="visually-hidden">: {t.question}</span>
                 </a>
               </div>
             </div>
@@ -211,6 +216,11 @@ const topics = [
     color: var(--green);
     font-size: 0.9375rem;
     font-weight: 600;
+  }
+
+  /* „· noch 5 Tage“ bricht nur als Ganzes um */
+  .forum-card__days {
+    white-space: nowrap;
   }
 
   .forum-card__num {

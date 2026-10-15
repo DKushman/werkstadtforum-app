@@ -1,24 +1,31 @@
 ---
 import Logo from "./Logo.astro";
 
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const onHome = path === "/";
+const section = (hash: string) => (onHome ? hash : `/${hash}`);
+
 const mainLinks = [
-  { href: "#hero-sheet", label: "Worum geht's?" },
-  { href: "#orte", label: "Was wird gebaut?" },
-  { href: "#charta", label: "Charta 2040" },
-  { href: "#termine", label: "Termine" },
-  { href: "#dabei", label: "Wer ist dabei?" },
-  { href: "#mitmachen", label: "Mitmachen" },
+  { href: "/worum-gehts", label: "Worum geht's?" },
+  { href: "/was-wird-gebaut", label: "Was wird gebaut?" },
+  { href: "/charta", label: "Charta 2040" },
+  { href: "/foren-ergebnisse", label: "Foren & Ergebnisse" },
+  { href: "/wer-ist-dabei", label: "Wer ist dabei?" },
+  { href: "/mitmachen", label: "Mitmachen" },
 ];
 
+/* Unten im Menü, klein. „Anmelden“ für alle Forum-Nutzer (nach Login: Avatar). */
 const subLinks = [
-  { href: "#forum", label: "Forum", icon: "forum" },
-  { href: "#partner", label: "Partner werden", icon: "handshake" },
-  { href: "#nachrichten", label: "Kontakt", icon: "phone" },
+  { href: "/anmelden", label: "Anmelden", icon: "user" },
+  { href: section("#partner"), label: "Partner werden", icon: "handshake" },
+  { href: section("#nachrichten"), label: "Kontakt", icon: "phone" },
 ] as const;
 
 const legalLinks = [
-  { href: "/impressum", label: "Impressum" },
+  { href: "/forenregeln", label: "Forenregeln" },
+  { href: "/nutzungsbedingungen", label: "Nutzungsbedingungen" },
   { href: "/datenschutz", label: "Datenschutz" },
+  { href: "/impressum", label: "Impressum" },
   { href: "/impressum#barrierefreiheit", label: "Barrierefreiheit" },
 ];
 
@@ -40,8 +47,8 @@ const navRevealCount = mainLinks.length + subLinks.length;
     </a>
 
     <div class="nav__actions">
-      <a class="nav__cta cta cta--forum" href="#forum">Forum</a>
-      <a class="nav__cta cta cta--nachrichten" href="#nachrichten">Nachrichten</a>
+      <a class="nav__cta cta cta--forum" href={section("#forum")}>Forum</a>
+      <a class="nav__cta cta cta--nachrichten" href={section("#nachrichten")}>Nachrichten</a>
     </div>
   </div>
 </header>
@@ -53,17 +60,11 @@ const navRevealCount = mainLinks.length + subLinks.length;
   aria-hidden="true"
   inert=""
 >
-  <svg class="nav__clip-def" aria-hidden="true" focusable="false">
-    <defs>
-      <clipPath id="nav-panel-clip" clipPathUnits="objectBoundingBox">
-        <path id="nav-curve-path" d="M 0,0 L 1,0 L 1,1 L 0,1 Z" />
-      </clipPath>
-    </defs>
-  </svg>
-
   <button class="nav__drawer-backdrop" type="button" tabindex="-1" aria-label="Menü schließen"></button>
 
   <div class="nav__panel-wrap">
+    <!-- Bogen der rechten Kante: Ellipse, die nur per transform federt (Compositor, kein Script) -->
+    <span class="nav__bulge" aria-hidden="true"></span>
     <div class="nav__panel">
       <div class="nav__panel-top">
         <button class="nav__close" type="button" aria-label="Menü schließen">
@@ -78,7 +79,11 @@ const navRevealCount = mainLinks.length + subLinks.length;
           {
             mainLinks.map((link, i) => (
               <li class="nav__reveal" style={`--nav-i:${i}; --nav-i-rev:${navRevealCount - 1 - i}`}>
-                <a class="nav__menu-link" href={link.href}>
+                <a
+                  class="nav__menu-link"
+                  href={link.href}
+                  aria-current={link.href === path ? "page" : undefined}
+                >
                   <span class="nav__link-window">
                     <span class="nav__link-rise">{link.label}</span>
                   </span>
@@ -91,15 +96,15 @@ const navRevealCount = mainLinks.length + subLinks.length;
               const idx = mainLinks.length + i;
               return (
                 <li
-                  class="nav__reveal"
+                  class:list={["nav__reveal", "nav__sub", i === 0 && "nav__sub--first"]}
                   style={`--nav-i:${idx}; --nav-i-rev:${navRevealCount - 1 - idx}`}
                 >
-                  <a class="nav__menu-link" href={link.href}>
+                  <a class="nav__menu-link nav__menu-link--small" href={link.href}>
                     <span class="nav__link-window">
                       <span class="nav__link-rise">
                         <span class="nav__link-row">
                           {
-                            link.icon === "forum" ? (
+                            link.icon === "user" ? (
                               <svg class="nav__link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <path
                                   fill="none"
@@ -107,7 +112,7 @@ const navRevealCount = mainLinks.length + subLinks.length;
                                   stroke-width="2"
                                   stroke-linecap="round"
                                   stroke-linejoin="round"
-                                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                  d="M20 21a8 8 0 0 0-16 0M12 13a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"
                                 />
                               </svg>
                             ) : link.icon === "handshake" ? (
@@ -164,12 +169,40 @@ const navRevealCount = mainLinks.length + subLinks.length;
 
 <script>
   import "../scripts/nav";
+
+  /* Nav hell schalten, solange eine Fläche mit [data-nav-dark] hinter ihr liegt.
+     Ein Observer auf den oberen Viewport-Streifen, keine Scroll-Arbeit. */
+  const dark = document.querySelectorAll("[data-nav-dark]");
+  if (dark.length) {
+    const LINE = 38; // Höhe der Nav-Mitte in px
+    const under = new Set<Element>();
+    let io: IntersectionObserver | undefined;
+    const watch = () => {
+      io?.disconnect();
+      under.clear();
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) e.isIntersecting ? under.add(e.target) : under.delete(e.target);
+          document.documentElement.classList.toggle("nav-on-dark", under.size > 0);
+        },
+        { rootMargin: `-${LINE}px 0px -${Math.max(0, innerHeight - LINE - 1)}px 0px` },
+      );
+      dark.forEach((el) => io!.observe(el));
+    };
+    watch();
+    let t = 0;
+    addEventListener("resize", () => {
+      clearTimeout(t);
+      t = window.setTimeout(watch, 150);
+    }, { passive: true });
+  }
 </script>
 
 <style>
   .nav {
     position: relative;
     z-index: 200;
+    view-transition-name: site-nav;
     padding: clamp(0.5rem, 2vw, 1.35rem) var(--gutter) 0;
     animation: nav-in 0.6s var(--ease-out) both;
   }
@@ -259,13 +292,6 @@ const navRevealCount = mainLinks.length + subLinks.length;
   }
 
   /* —— Drawer —— */
-  .nav__clip-def {
-    position: absolute;
-    width: 0;
-    height: 0;
-    overflow: hidden;
-  }
-
   .nav__drawer {
     position: fixed;
     inset: 0;
@@ -306,27 +332,95 @@ const navRevealCount = mainLinks.length + subLinks.length;
     opacity: 1;
   }
 
+  /* Panel = Rechteck (64 %) + Ellipse an der Kante (Mitte bei 64 %, Halbbreite 36 %):
+     zusammen die konvexe Rundung. Beide gleiche Farbe, Überlappung unsichtbar. */
   .nav__panel-wrap {
+    --edge: 64%;
+    --bow: 36%;
     position: absolute;
     inset: 0 auto 0 0;
-    width: 50vw;
+    width: 54vw;
     height: 100%;
-    transform: translate3d(-108%, 0, 0);
-    transition: transform 0.52s cubic-bezier(0.55, 0.06, 0.85, 0.45);
+    transform: translate3d(-120%, 0, 0);
+    transition: transform 0.5s cubic-bezier(0.6, 0, 0.85, 0.3);
     will-change: transform;
   }
 
   .nav__drawer.is-open .nav__panel-wrap {
     transform: translate3d(0, 0, 0);
-    transition: transform 0.64s cubic-bezier(0.15, 0.85, 0.35, 1);
+    transition: transform 0.62s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .nav__drawer.is-closing .nav__panel-wrap {
-    transform: translate3d(-108%, 0, 0);
-    transition: transform 0.52s cubic-bezier(0.55, 0.06, 0.85, 0.45);
+    transform: translate3d(-120%, 0, 0);
+    transition: transform 0.5s cubic-bezier(0.6, 0, 0.85, 0.3);
+  }
+
+  .nav__bulge {
+    position: absolute;
+    top: 0;
+    left: calc(var(--edge) - var(--bow));
+    width: calc(var(--bow) * 2);
+    height: 100%;
+    border-radius: 50%;
+    background: var(--green);
+    transform: scaleX(0);
+    will-change: transform;
+  }
+
+  /* Öffnen: der Bogen schießt über, schwingt zurück und pendelt sich ein (Feder) */
+  .nav__drawer.is-open .nav__bulge {
+    animation: nav-bulge-in 1.05s 0.12s both;
+  }
+
+  /* Schließen: kurzes Nachziehen, dann flach */
+  .nav__drawer.is-closing .nav__bulge {
+    animation: nav-bulge-out 0.42s both;
+  }
+
+  @keyframes nav-bulge-in {
+    0% {
+      transform: scaleX(0);
+      animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+    }
+    30% {
+      transform: scaleX(1.32);
+      animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+    }
+    52% {
+      transform: scaleX(0.8);
+      animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+    }
+    70% {
+      transform: scaleX(1.1);
+      animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+    }
+    85% {
+      transform: scaleX(0.96);
+      animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+    }
+    100% {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes nav-bulge-out {
+    0% {
+      transform: scaleX(1);
+      animation-timing-function: cubic-bezier(0.3, 0, 0.6, 1);
+    }
+    35% {
+      transform: scaleX(1.25);
+      animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.4);
+    }
+    100% {
+      transform: scaleX(0);
+    }
   }
 
   .nav__panel {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -336,10 +430,9 @@ const navRevealCount = mainLinks.length + subLinks.length;
       clamp(1.5rem, 4.5vw, 2.75rem)
       max(1.25rem, env(safe-area-inset-bottom, 0px) + 0.85rem)
       clamp(1.15rem, 3.5vw, 1.85rem);
-    background: var(--green);
+    /* Fläche nur bis zur Kante (Rest bildet der Bogen); Inhalt darf volle Breite nutzen */
+    background: linear-gradient(90deg, var(--green) var(--edge), transparent var(--edge));
     color: var(--beige);
-    clip-path: url(#nav-panel-clip);
-    -webkit-clip-path: url(#nav-panel-clip);
   }
 
   .nav__panel-top {
@@ -479,6 +572,19 @@ const navRevealCount = mainLinks.length + subLinks.length;
     transition: transform 0.36s var(--ease-out);
   }
 
+  /* Unten im Menü, klein */
+  .nav__sub--first {
+    margin-top: clamp(0.85rem, 2.5vh, 1.5rem);
+    padding-top: clamp(0.7rem, 2vh, 1.1rem);
+    border-top: 1px solid rgb(245 241 228 / 0.16);
+  }
+
+  .nav__menu-link--small {
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
   .nav__link-row {
     display: inline-flex;
     align-items: center;
@@ -551,6 +657,31 @@ const navRevealCount = mainLinks.length + subLinks.length;
 
   }
 
+  /* Über dunklen Flächen (Desktop): Burger und Forum-Button hell */
+  @media (min-width: 641px) {
+    :global(html.nav-on-dark) .nav__burger-bars,
+    :global(html.nav-on-dark) .nav__burger-bars::before,
+    :global(html.nav-on-dark) .nav__burger-bars::after {
+      background: var(--beige);
+    }
+
+    :global(html.nav-on-dark) .nav__cta.cta--forum {
+      --cta-bg: var(--beige);
+      --cta-fg: var(--green);
+      --cta-hover-bg: #fff;
+      --cta-hover-fg: var(--green);
+    }
+
+    .nav__burger-bars,
+    .nav__burger-bars::before,
+    .nav__burger-bars::after {
+      transition:
+        transform 0.3s var(--ease-out),
+        opacity 0.25s var(--ease-out),
+        background-color 0.3s var(--ease-out);
+    }
+  }
+
   @media (max-width: 640px) {
     .nav {
       position: fixed;
@@ -603,16 +734,26 @@ const navRevealCount = mainLinks.length + subLinks.length;
       border-radius: 0.65rem;
     }
 
+    .nav__panel-wrap {
+      --edge: 100%;
+    }
+
     .nav__panel {
       padding-inline: clamp(1rem, 4.5vw, 1.35rem);
-      clip-path: none;
-      -webkit-clip-path: none;
+    }
+
+    .nav__bulge {
+      display: none;
     }
 
     .nav__menu-link {
       font-size: clamp(1.52rem, 6.8vw, 2.05rem);
       line-height: 1.06;
       padding-block: 0.14em;
+    }
+
+    .nav__menu-link--small {
+      font-size: clamp(1rem, 4.4vw, 1.15rem);
     }
 
     .nav__main {
@@ -670,6 +811,15 @@ const navRevealCount = mainLinks.length + subLinks.length;
     .nav__panel-wrap,
     .nav__drawer-backdrop {
       transition: none;
+    }
+
+    .nav__drawer.is-open .nav__bulge {
+      animation: none;
+      transform: scaleX(1);
+    }
+
+    .nav__drawer.is-closing .nav__bulge {
+      animation: none;
     }
 
     .nav__drawer:not(.is-open):not(.is-closing) .nav__panel-wrap {

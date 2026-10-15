@@ -1,0 +1,136 @@
+---
+/** Hinweiskasten (hellgrün, zentriert). Ohne Slot: Standardinhalt „Wir bauen nicht selbst.“ */
+interface Props {
+  id?: string;
+  title?: string;
+}
+const { id = "wir-bauen-nicht", title = "Wir bauen nicht selbst." } = Astro.props;
+const custom = Astro.slots.has("default");
+const points = [
+  "Kein Bauherr, kein Amt.",
+  "Entschieden wird von der Politik.",
+  "Wir sorgen dafür, dass vorher alle mitreden.",
+] as const;
+---
+
+<section class="hinweis" id={id} aria-labelledby={`${id}-title`}>
+  <!-- Kasten ist Startpunkt der Brückenlinie (data-bridge-disc), liegt über der Linie (z 3) -->
+  <div class="hinweis__box" data-bridge-disc>
+    <h2 class="hinweis__title" id={`${id}-title`}>{title}</h2>
+    {
+      custom ? (
+        <div class="hinweis__body">
+          <slot />
+        </div>
+      ) : (
+        <>
+          <ul class="hinweis__list">
+            {points.map((point) => (
+              <li class="hinweis__point">{point}</li>
+            ))}
+          </ul>
+          <p class="hinweis__meta">
+            Stand vom <time datetime="2026-10-13">13.10.2026</time>
+          </p>
+        </>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* Kein z-index auf der Section, damit die Brückenlinie (z 1) darüber malen kann */
+  .hinweis {
+    position: relative;
+    padding-inline: var(--gutter);
+    /* transparent: der beige Grund (mit runden oberen Ecken) kommt vom .forum-bridge-Wrapper */
+    background: transparent;
+    color: #0f5c42;
+  }
+
+  .hinweis__box {
+    position: relative;
+    z-index: 3;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: clamp(1.75rem, 4.5vw, 3.25rem) clamp(1.35rem, 4vw, 3rem) clamp(1.75rem, 4vw, 2.75rem);
+    border-radius: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--sheet);
+    text-align: center;
+  }
+
+  .hinweis__title {
+    margin: 0;
+    font-size: clamp(2rem, 7.5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .hinweis__list {
+    display: grid;
+    margin: clamp(1.25rem, 3vh, 1.75rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hinweis__point {
+    padding: clamp(0.7rem, 1.8vh, 0.95rem) 0;
+    border-top: 1px solid rgb(15 92 66 / 0.22);
+    font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .hinweis__point:last-child {
+    border-bottom: 1px solid rgb(15 92 66 / 0.22);
+  }
+
+  .hinweis__body {
+    max-width: 34rem;
+    margin: clamp(1rem, 2.6vh, 1.4rem) auto 0;
+    font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+    font-weight: 600;
+    line-height: 1.42;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+  }
+
+  .hinweis__body :global(p) {
+    margin: 0;
+  }
+
+  .hinweis__body :global(p + p) {
+    margin-top: 0.75em;
+  }
+
+  .hinweis__body :global(strong) {
+    font-weight: 800;
+  }
+
+  .hinweis__body :global(.hinweis__chip) {
+    display: inline-block;
+    padding: 0 0.45em;
+    border: 1.5px dashed rgb(15 92 66 / 0.5);
+    border-radius: 0.4rem;
+    font-size: 0.85em;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .hinweis__meta {
+    margin: clamp(1rem, 2.4vh, 1.35rem) 0 0;
+    color: rgb(15 92 66 / 0.78);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  @media (forced-colors: active) {
+    .hinweis__box {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

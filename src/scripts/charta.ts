@@ -18,6 +18,7 @@ if (section) {
   const runCount = (el: HTMLElement) => {
     if (el.dataset.done === "1") return;
     el.dataset.done = "1";
+    if (el.dataset.static === "true") return; // Jahreszahlen nicht hochzählen
     const target = Number(el.dataset.value);
     const suffix = el.dataset.suffix ?? "";
     const useLocale = el.dataset.locale === "true";

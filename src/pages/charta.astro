@@ -1,0 +1,99 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import PageHero from "../components/PageHero.astro";
+import PillLink from "../components/PillLink.astro";
+import ChartaIdeeSection from "../components/ChartaIdeeSection.astro";
+import ChartaZieleSection from "../components/ChartaZieleSection.astro";
+import ChartaEntstehungTimeline from "../components/ChartaEntstehungTimeline.astro";
+import ChartaInhaltSection from "../components/ChartaInhaltSection.astro";
+import HinweisSection from "../components/HinweisSection.astro";
+import MitmachenSection from "../components/MitmachenSection.astro";
+import ForumBridgeLine from "../components/ForumBridgeLine.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import finanziererin from "../assets/hero/finanziererin.webp";
+
+const title = "Charta 2040 – WerkStadtForum";
+const description =
+  "79 Ziele für eine offene Stadt: Die Charta 2040 beschreibt, wie die City West im Jahr 2040 aussehen soll. Grüner, ruhiger, bezahlbarer und lebendiger.";
+const lead =
+  "Die Charta ist unser gemeinsamer Plan für die City West. Sie beschreibt, wie die Gegend im Jahr 2040 aussehen soll: grüner, ruhiger, bezahlbarer und lebendiger.";
+
+// Platzhalter: PDF liegt noch nicht im Projekt
+const pdfHref = "/downloads/charta-2040.pdf";
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Charta 2040",
+  description,
+  url: canonical.href,
+  inLanguage: "de-DE",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "WerkStadtForum",
+    url: Astro.site?.href ?? "https://werkstadtforum.de/",
+  },
+};
+---
+
+<Base title={title} description={description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+  <Nav />
+  <div class="page-sheet">
+    <main>
+      <PageHero
+        title={["Charta 2040"]}
+        sub="79 Ziele für eine offene Stadt."
+        lead={lead}
+        image={finanziererin}
+        flip
+        wide
+      >
+        <Fragment slot="actions">
+          <PillLink href="#ziele" label="Zu den Zielen" variant="on-beige" />
+          <a class="hero-download" href={pdfHref} download>Charta herunterladen</a>
+        </Fragment>
+        <ChartaIdeeSection slot="sheet" />
+      </PageHero>
+      <ChartaZieleSection pdfHref={pdfHref} />
+      <ChartaEntstehungTimeline />
+      <ChartaInhaltSection pdfHref={pdfHref} />
+      <div class="forum-bridge" data-worum-bridge data-line-start="0.5" style="--bridge-color: #b4e69a">
+        <ForumBridgeLine />
+        <HinweisSection id="gesetz" title="Ist das jetzt Gesetz?">
+          <p>
+            <strong>Nein.</strong> Die Charta ist eine Empfehlung. Verbindlich wird sie erst, wenn die Politik sie
+            beschließt. <span class="hinweis__chip">Stand: …</span>
+          </p>
+          <p>Und sie ist nie ganz fertig: Die Ziele sollen sich anpassen lassen, wenn sich die Stadt verändert.</p>
+        </HinweisSection>
+        <MitmachenSection />
+      </div>
+    </main>
+  </div>
+  <SiteFooter />
+</Base>
+
+<style>
+  .hero-download {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--green);
+    font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  .hero-download:hover,
+  .hero-download:focus-visible {
+    color: var(--green-light);
+  }
+</style>

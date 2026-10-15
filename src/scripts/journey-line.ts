@@ -11,6 +11,11 @@ const mobile = matchMedia("(max-width: 640px)");
 const root = document.getElementById("hero-follow");
 const svg = root?.querySelector<SVGSVGElement>(".journey-line");
 
+/** Linie startet, sobald ihr Anfang unten ins Bild kommt … */
+const START_AT = 1;
+/** … und ist nach diesem Anteil ihrer Höhe an Scroll-Weg fertig gezeichnet (< 1 = schneller). */
+const SPEED = 0.7;
+
 const GAP_MOBILE = 10;
 const GAP_DESKTOP = 14;
 const ARROW = 11;
@@ -54,9 +59,15 @@ if (root && svg) {
   let ready = false;
   let queued = false;
   let dotMode: "mobile" | "desktop" = "desktop";
+  let near = false;
+  let lastP = -1;
+  const lastOffsets: string[] = [];
 
   const layout = () => {
     ready = false;
+    // neue Geometrie: Zeichenstand neu schreiben
+    lastP = -1;
+    lastOffsets.length = 0;
     if (cards.length < 3 || !title) return;
 
     const [c1, c2, c3] = cards;
@@ -153,14 +164,18 @@ if (root && svg) {
 
   const update = () => {
     queued = false;
-    if (!ready) return;
+    // Auf dem Handy ist die Linie per CSS ausgeblendet: nichts rechnen
+    if (!ready || mobile.matches) return;
 
     let p = 1;
     if (!reduceMotion.matches) {
       const top = root.getBoundingClientRect().top;
-      const line = innerHeight * 0.72;
-      p = Math.min(Math.max((line - (top + startY)) / (endY - startY), 0), 1);
+      const line = innerHeight * START_AT;
+      p = Math.min(Math.max((line - (top + startY)) / ((endY - startY) * SPEED), 0), 1);
     }
+    p = Math.round(p * 1000) / 1000;
+    if (p === lastP) return;
+    lastP = p;
 
     const total = lengths.reduce((a, b) => a + b, 0);
     let drawn = p * total;
@@ -170,7 +185,13 @@ if (root && svg) {
       return v;
     });
 
-    segs.forEach((s, i) => (s.style.strokeDashoffset = String(1 - local[i])));
+    // nur geänderte Werte schreiben (jeder Schreibzugriff malt das SVG neu)
+    segs.forEach((s, i) => {
+      const next = (1 - local[i]).toFixed(3);
+      if (lastOffsets[i] === next) return;
+      lastOffsets[i] = next;
+      s.style.strokeDashoffset = next;
+    });
     dots[0].classList.toggle("is-on", p > 0);
 
     if (dotMode === "mobile") {
@@ -189,10 +210,19 @@ if (root && svg) {
   };
 
   const onScroll = () => {
-    if (queued) return;
+    if (queued || !near) return;
     queued = true;
     requestAnimationFrame(update);
   };
+
+  // Scroll-Arbeit nur, solange der Bereich (plus etwas Vorlauf) im Viewport ist
+  new IntersectionObserver(
+    ([entry]) => {
+      near = entry.isIntersecting;
+      if (near) onScroll();
+    },
+    { rootMargin: "25% 0px" },
+  ).observe(root);
 
   new ResizeObserver(layout).observe(root);
   mobile.addEventListener("change", layout);

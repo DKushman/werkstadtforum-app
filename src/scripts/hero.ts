@@ -115,6 +115,27 @@ if (hero && svg) {
   svg.closest(".scene")?.addEventListener("animationend", invalidate);
 }
 
+const sheet = document.getElementById("hero-sheet");
+const sheetContent = document.querySelector<HTMLElement>(".sheet__content");
+if (sheet) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    sheet.classList.add("is-revealed");
+  } else {
+    const revealSheet = () => sheet.classList.add("is-revealed");
+    const sheetReveal = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          revealSheet();
+          sheetReveal.disconnect();
+        }
+      },
+      { threshold: 0, rootMargin: "0px 0px 12% 0px" },
+    );
+    sheetReveal.observe(sheetContent ?? sheet);
+  }
+}
+
 const processCards = document.querySelectorAll<HTMLElement>(".process-card");
 
 if (processCards.length) {

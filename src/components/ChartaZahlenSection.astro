@@ -1,0 +1,249 @@
+---
+const facts = [
+  { value: "2040", text: "klimaneutral. Zehn Jahre früher als ganz Berlin.", goal: 14, tone: "green" },
+  { value: "20.000", text: "neue Wohnungen bis 2040.", goal: 43, tone: "yellow" },
+  { value: "80 %", text: "der Dächer werden grün.", goal: 20, tone: "sheet" },
+  { value: "3 Min.", text: "Takt für Busse auf Ku’damm und Kantstraße.", goal: 3, tone: "purple" },
+] as const;
+---
+
+<section class="zahlen" id="konkret" aria-labelledby="zahlen-title">
+  <h2 class="zahlen__title" id="zahlen-title">Was das konkret heißt.</h2>
+
+  <ul class="zahlen__grid">
+    {
+      facts.map((fact, index) => (
+        <li class:list={["zahlen__card", `zahlen__card--${fact.tone}`]} style={`--i: ${index}`}>
+          <p class="zahlen__value">
+            <span class="zahlen__value-in">{fact.value}</span>
+          </p>
+          <p class="zahlen__text">{fact.text}</p>
+          <a class="zahlen__goal" href={`#ziel-${fact.goal}`}>
+            Ziel {fact.goal}
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M3.5 8h8.2M8.8 4.8 12.2 8l-3.4 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .zahlen {
+    --round: clamp(1.5rem, 3.2vw, 2.75rem);
+    position: relative;
+    z-index: 4; /* über der hochfahrenden Fläche (z 3) */
+    margin-top: calc(var(--round) * -1);
+    padding-inline: var(--gutter);
+    border-radius: var(--round) var(--round) 0 0;
+    scroll-margin-top: 4rem;
+    background: var(--beige);
+    color: var(--green);
+  }
+
+  .zahlen__title {
+    margin: 0;
+    max-width: 14ch;
+    font-size: clamp(2.2rem, 9vw, 3.6rem);
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  /* Mobil: Wisch-Slider, Tablet 2 × 2, Desktop vier nebeneinander */
+  .zahlen__grid {
+    display: flex;
+    gap: clamp(0.75rem, 1.6vw, 1.15rem);
+    margin: clamp(1.75rem, 5vh, 2.75rem) calc(var(--gutter) * -1) 0;
+    padding: 0 var(--gutter);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .zahlen__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .zahlen__card {
+    --card-bg: var(--green);
+    --card-fg: var(--forum-text);
+    --card-text: var(--beige);
+    --goal-bg: rgb(245 241 228 / 0.14);
+    position: relative;
+    display: flex;
+    flex: 0 0 min(78vw, 20rem);
+    flex-direction: column;
+    min-height: clamp(18rem, 46vh, 22rem);
+    padding: clamp(1.25rem, 2vw, 1.75rem);
+    overflow: hidden;
+    border-radius: clamp(1.4rem, 2.4vw, 2rem);
+    background: var(--card-bg);
+    color: var(--card-fg);
+    scroll-snap-align: start;
+    container-type: inline-size;
+  }
+
+  /* dezente Ringe als Textur oben rechts (statisch, einmal gemalt) */
+  .zahlen__card::before {
+    content: "";
+    position: absolute;
+    top: -38%;
+    right: -38%;
+    width: 85%;
+    aspect-ratio: 1;
+    border: clamp(1.5rem, 9cqi, 2.6rem) solid currentColor;
+    border-radius: 50%;
+    opacity: 0.09;
+    pointer-events: none;
+  }
+
+  .zahlen__card--yellow {
+    --card-bg: var(--yellow);
+    --card-fg: var(--green);
+    --card-text: var(--green);
+    --goal-bg: rgb(27 74 20 / 0.1);
+  }
+
+  .zahlen__card--sheet {
+    --card-bg: var(--sheet);
+    --card-fg: #0f5c42;
+    --card-text: #0f5c42;
+    --goal-bg: rgb(15 92 66 / 0.1);
+  }
+
+  .zahlen__card--purple {
+    --card-bg: var(--logo-purple);
+    --card-fg: var(--beige);
+    --card-text: var(--beige);
+  }
+
+  /* Einblenden beim Reinscrollen: reines CSS (scroll-driven), ohne Script */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .zahlen__card {
+        animation: zahlen-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 55%;
+      }
+    }
+  }
+
+  @keyframes zahlen-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.5rem, 0);
+    }
+  }
+
+  .zahlen__value {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+    font-size: clamp(2.8rem, 6vw, 4.75rem);
+    font-size: clamp(2.8rem, 25cqi, 5.25rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+  }
+
+  .zahlen__value-in {
+    display: block;
+  }
+
+  .zahlen__text {
+    position: relative;
+    max-width: 18rem;
+    margin: auto 0 0;
+    padding-top: 1.25rem;
+    color: var(--card-text);
+    font-size: clamp(1rem, 1.25vw, 1.15rem);
+    font-weight: 600;
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+  }
+
+  .zahlen__goal {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    align-self: flex-start;
+    min-height: 44px;
+    margin-top: 1rem;
+    padding: 0 0.95rem;
+    border-radius: 999px;
+    background: var(--goal-bg);
+    color: var(--card-text);
+    font-size: 0.875rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    transition: background-color 0.25s var(--ease-out);
+  }
+
+  .zahlen__goal svg {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.35s var(--ease-out);
+  }
+
+  .zahlen__goal:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+
+    .zahlen__goal:hover svg {
+      transform: translate3d(0.2rem, 0, 0);
+    }
+  }
+
+  @media (min-width: 640px) {
+    .zahlen__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-inline: 0;
+      padding: 0;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+    .zahlen__card {
+      flex: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .zahlen__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .zahlen__card {
+      min-height: clamp(18rem, 42vh, 22rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zahlen__goal svg {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .zahlen__card {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

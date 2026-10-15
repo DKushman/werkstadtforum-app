@@ -1,0 +1,219 @@
+---
+import { Image } from "astro:assets";
+import bezirk from "../assets/logos/web/bezirk.png";
+import agCity from "../assets/logos/web/ag-city.png";
+import ihk from "../assets/logos/web/ihk-berlin.png";
+import vbki from "../assets/logos/web/vbki.png";
+import werkbund from "../assets/logos/web/werkbund-berlin.png";
+
+const logos = [
+  // scale: optischer Ausgleich (Logos haben unterschiedlich viel Weißraum)
+  {
+    src: bezirk,
+    name: "Bezirk Charlottenburg-Wilmersdorf",
+    text: "Die Verwaltung des Bezirks, zu dem die City West gehört.",
+    scale: 1.45,
+  },
+  {
+    src: agCity,
+    name: "AG City",
+    text: "Zusammenschluss von Handel, Gastronomie und Eigentümern in der City West.",
+    scale: 1,
+  },
+  { src: ihk, name: "IHK Berlin", text: "Die Industrie- und Handelskammer, Stimme der Berliner Wirtschaft.", scale: 0.9 },
+  { src: vbki, name: "VBKI", text: "Verein Berliner Kaufleute und Industrieller, Netzwerk für Berlin.", scale: 1.05 },
+  {
+    src: werkbund,
+    name: "Deutscher Werkbund Berlin",
+    text: "Verband für gute Gestaltung, Architektur und Baukultur.",
+    scale: 0.95,
+  },
+] as const;
+---
+
+<section class="init" id="initiatoren" aria-labelledby="init-title">
+  <div class="init__head">
+    <p class="init__kicker">Initiatoren</p>
+    <h2 class="init__title" id="init-title">Wer das angestoßen hat.</h2>
+    <p class="init__lead">
+      2019 haben fünf Institutionen das WerkStadtForum ins Leben gerufen. Heute wird es von einem breiteren Kreis aus
+      Verbänden, Eigentümern und Partnern getragen.
+    </p>
+  </div>
+
+  <!-- Raster mit Trennlinien: jede Institution in einem eigenen Feld, ohne Füllung -->
+  <div class="init__frame">
+    <ul class="init__grid">
+      {
+        logos.map((logo) => (
+          <li class="init__cell" style={`--scale: ${logo.scale}`}>
+            <span class="init__mark">
+              <Image
+                src={logo.src}
+                alt=""
+                height={160}
+                densities={[1, 2]}
+                loading="lazy"
+                decoding="async"
+                class="init__logo"
+              />
+            </span>
+            <h3 class="init__name">{logo.name}</h3>
+            <p class="init__text">{logo.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .init {
+    position: relative;
+    padding-inline: var(--gutter);
+    background: var(--beige);
+    color: var(--green);
+    scroll-margin-top: 4rem;
+  }
+
+  .init__head {
+    max-width: 44rem;
+  }
+
+  .init__kicker {
+    margin: 0 0 0.6rem;
+    color: var(--green-light);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .init__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .init__lead {
+    max-width: 38rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+  }
+
+  /* Rahmen: Linie oben und unten; innen trennen feine Linien die Felder.
+     Trick: jedes Feld zeichnet Linie oben + links und wird um die Linienbreite
+     nach oben/links verschoben – die äußeren Linien verschwinden im overflow. */
+  .init__frame {
+    --rule: rgb(27 74 20 / 0.22);
+    --w: 1.5px;
+    margin: clamp(1.75rem, 5vh, 2.75rem) 0 0;
+    overflow: hidden;
+    border-top: var(--w) solid var(--rule);
+    border-bottom: var(--w) solid var(--rule);
+  }
+
+  .init__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .init__cell {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin: calc(var(--w) * -1) 0 0 calc(var(--w) * -1);
+    padding: clamp(1.25rem, 2.4vw, 2rem) clamp(1rem, 2vw, 1.75rem) clamp(1.4rem, 2.6vw, 2.2rem);
+    border-top: var(--w) solid var(--rule);
+    border-left: var(--w) solid var(--rule);
+  }
+
+  /* Logo-Fläche fester Höhe: Namen stehen in einer Linie */
+  .init__mark {
+    display: flex;
+    align-items: center;
+    height: clamp(3.25rem, 5vw, 4.5rem);
+    margin-bottom: clamp(1rem, 2.4vh, 1.5rem);
+  }
+
+  .init__logo {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: calc(clamp(2rem, 3.2vw, 2.9rem) * var(--scale, 1));
+    object-fit: contain;
+    object-position: left center;
+  }
+
+  .init__name {
+    margin: 0;
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .init__text {
+    margin: 0.45rem 0 0;
+    color: var(--text);
+    font-size: clamp(0.875rem, 1vw, 0.975rem);
+    font-weight: 500;
+    line-height: 1.42;
+    text-wrap: pretty;
+  }
+
+  .init__cell:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 640px) {
+    .init__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .init__cell:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .init__grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .init__cell > * {
+        animation: init-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 50%;
+      }
+    }
+  }
+
+  @keyframes init-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1rem, 0);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .init__frame,
+    .init__cell {
+      border-color: CanvasText;
+    }
+  }
+</style>

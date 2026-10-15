@@ -12,10 +12,29 @@ if (footer && sheet) {
   let open = false;
   let shift = -1;
   let listening = false;
+  let near = false;
+  let travel = 0;
+
+  /* Scroll-Arbeit nur am Seitenende: ein 0-px-Marker am Ende des Inhalts meldet,
+     wann der Footer in Reichweite ist. Davor kein Layout-Lesen pro Frame. */
+  const sentinel = document.createElement("div");
+  sentinel.setAttribute("aria-hidden", "true");
+  sheet.append(sentinel);
+  const nearObserver = new IntersectionObserver(
+    ([entry]) => {
+      near = entry.isIntersecting;
+      if (near) onScroll();
+    },
+    { rootMargin: "0px 0px 100% 0px" },
+  );
+
+  const measure = () => {
+    travel = parseFloat(getComputedStyle(sheet).marginBottom) || footer.offsetHeight || window.innerHeight;
+  };
 
   const update = () => {
     queued = false;
-    if (!desktop.matches) return;
+    if (!desktop.matches || !near) return;
 
     const vh = window.innerHeight;
     const bottom = sheet.getBoundingClientRect().bottom;
@@ -36,7 +55,6 @@ if (footer && sheet) {
       return;
     }
 
-    const travel = parseFloat(getComputedStyle(sheet).marginBottom) || footer.offsetHeight || vh;
     const progress = Math.min(Math.max(revealed / travel, 0), 1);
     const next = Math.round((1 - progress) * lift * 2) / 2;
     if (next === shift) return;
@@ -44,16 +62,22 @@ if (footer && sheet) {
     footer.style.setProperty("--footer-shift", `${next}px`);
   };
 
-  const onScroll = () => {
-    if (queued) return;
+  function onScroll() {
+    if (queued || !near) return;
     queued = true;
     requestAnimationFrame(update);
+  }
+
+  const onResize = () => {
+    measure();
+    onScroll();
   };
 
   const teardownDesktop = () => {
     if (!listening) return;
     window.removeEventListener("scroll", onScroll);
-    window.removeEventListener("resize", onScroll);
+    window.removeEventListener("resize", onResize);
+    nearObserver.disconnect();
     listening = false;
   };
 
@@ -66,10 +90,11 @@ if (footer && sheet) {
     if (desktop.matches) {
       footer.inert = true;
       footer.classList.remove("is-revealed");
+      measure();
       window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("resize", onScroll, { passive: true });
+      window.addEventListener("resize", onResize, { passive: true });
+      nearObserver.observe(sentinel);
       listening = true;
-      update();
       return;
     }
 

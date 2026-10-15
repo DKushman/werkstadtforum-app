@@ -1,0 +1,171 @@
+---
+// „Gut zu wissen.“ – drei Infopunkte. Die Fläche ist zugleich Ursprung der Brückenlinie
+// (gleiche Farbe wie die Linie, sie wächst unten rechts heraus in die Mitmachen-Section).
+const facts = [
+  { title: "Auf Wunsch anonym", text: "Du entscheidest, ob dein Name erscheint." },
+  { title: "Kostenlos", text: "Mitmachen kostet nichts." },
+  {
+    title: "Es kommt an",
+    text: "Die Ergebnisse gehen gesammelt an die Foren vor Ort, wo Politik, Verwaltung und Wirtschaft am Tisch sitzen.",
+  },
+] as const;
+---
+
+<section class="wissen" id="gut-zu-wissen" aria-labelledby="wissen-title" data-nav-dark>
+  <div class="wissen__box">
+    <h2 class="wissen__badge" id="wissen-title">
+      <span class="wissen__i" aria-hidden="true">i</span>
+      Gut zu wissen
+    </h2>
+
+    <ul class="wissen__grid">
+      {
+        facts.map((fact) => (
+          <li class="wissen__item">
+            <h3 class="wissen__name">{fact.title}</h3>
+            <p class="wissen__text">{fact.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <span class="wissen__origin" data-bridge-disc aria-hidden="true"></span>
+</section>
+
+<style>
+  /* Gleiches Dunkelbraun wie die Schritte-Fläche, schließt nahtlos an (oben eckig, unten rund).
+     Kein z-index: die Brückenlinie (z 1) malt über den eigenen Grund. */
+  .wissen {
+    --round: clamp(1.5rem, 3.2vw, 2.75rem);
+    --bg: #5a3e32;
+    position: relative;
+    /* 2 px Überlappung mit der Schritte-Fläche: schließt die Haarlinie (Subpixel-Rundung) */
+    margin-top: -2px;
+    padding: calc(clamp(1rem, 3vh, 2rem) + 2px) var(--gutter) clamp(4rem, 10vh, 6rem);
+    border-radius: 0 0 var(--round) var(--round);
+    background: var(--bg);
+    color: var(--beige);
+    scroll-margin-top: 4rem;
+  }
+
+  /* Container mit beiger Kontur; die Info-Plakette sitzt oben links auf der Linie */
+  .wissen__box {
+    position: relative;
+    margin-top: 1.4rem;
+    padding: clamp(2.5rem, 6vh, 3.5rem) clamp(1.25rem, 3vw, 2.75rem) clamp(1.75rem, 4vh, 2.5rem);
+    border: 2px solid rgb(245 241 228 / 0.55);
+    border-radius: clamp(1.25rem, 2.4vw, 2rem);
+  }
+
+  .wissen__badge {
+    position: absolute;
+    top: 0;
+    left: clamp(1rem, 2.6vw, 2.25rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0 0.75rem 0 0.4rem;
+    background: var(--bg);
+    font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    transform: translateY(-50%);
+  }
+
+  .wissen__i {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--beige);
+    color: var(--bg);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.45rem;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .wissen__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vh, 1.75rem) clamp(1.5rem, 4vw, 3.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .wissen__item {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+  }
+
+  .wissen__name {
+    margin: 0;
+    font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .wissen__text {
+    margin: 0;
+    max-width: 24rem;
+    color: rgb(245 241 228 / 0.84);
+    font-size: clamp(0.975rem, 1.15vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  /* Ursprung der Linie: unsichtbarer Streifen unten rechts; Breite → Strichstärke (62 %) */
+  .wissen__origin {
+    position: absolute;
+    right: calc(var(--gutter) + var(--round));
+    bottom: 0;
+    width: min(24rem, 40%);
+    height: 1px;
+    pointer-events: none;
+  }
+
+  @media (min-width: 900px) {
+    .wissen__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .wissen__item + .wissen__item {
+      padding-left: clamp(1.5rem, 4vw, 3.5rem);
+      border-left: 1.5px solid rgb(245 241 228 / 0.2);
+    }
+
+    .wissen__grid {
+      column-gap: 0;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .wissen__item {
+        animation: wissen-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 55%;
+      }
+    }
+  }
+
+  @keyframes wissen-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1rem, 0);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .wissen__box {
+      border-color: CanvasText;
+    }
+  }
+</style>

@@ -1,0 +1,258 @@
+---
+import PillLink from "./PillLink.astro";
+
+interface Props {
+  pdfHref: string;
+}
+const { pdfHref } = Astro.props;
+
+const parts = [
+  { title: "Räumliches Leitbild", text: "Eine Karte, die zeigt, welche Orte wofür wichtig sind.", art: "map", tone: "yellow" },
+  { title: "Mobilitätskonzept", text: "Wie man 2040 in der City West unterwegs ist.", art: "route", tone: "blue" },
+  { title: "Rahmenplan Breitscheidplatz", text: "Ein erster Entwurf für einen echten Ort.", art: "plan", tone: "purple" },
+] as const;
+---
+
+<section class="inhalt" id="inhalt" aria-labelledby="inhalt-title">
+  <div class="inhalt__head">
+    <h2 class="inhalt__title" id="inhalt-title">Und was steht sonst noch drin?</h2>
+    <p class="inhalt__lead">
+      Neben den 79 Zielen enthält die Charta Pläne, die zeigen, wie die Ziele umgesetzt werden können.
+    </p>
+  </div>
+
+  <ul class="inhalt__grid">
+    {
+      parts.map((part, i) => (
+        <li class:list={["inhalt__card", `inhalt__card--${part.tone}`]} style={`--i: ${i}`}>
+          <div class="inhalt__art" aria-hidden="true">
+            {part.art === "map" && (
+              <svg viewBox="0 0 240 150" focusable="false">
+                <path d="M-12 100c44-14 72 8 120-8s76-46 144-30" fill="none" stroke="var(--art-line)" stroke-width="10" stroke-linecap="round" />
+                <path d="M78 -10c-6 46 16 80 6 170M168 -10c10 50-14 90 4 170" fill="none" stroke="var(--art-line)" stroke-width="6" stroke-linecap="round" opacity="0.6" />
+                <circle cx="62" cy="52" r="20" fill="var(--art-a)" />
+                <circle cx="182" cy="104" r="16" fill="var(--art-b)" />
+                <rect x="118" y="34" width="34" height="26" rx="6" fill="var(--art-b)" />
+                <path d="M128 112c0-10 8-18 18-18s18 8 18 18c0 14-18 26-18 26s-18-12-18-26Z" fill="var(--art-ink)" />
+                <circle cx="146" cy="111" r="6" fill="var(--art-bg)" />
+              </svg>
+            )}
+            {part.art === "route" && (
+              <svg viewBox="0 0 240 150" focusable="false">
+                <path d="M30 112c40 0 40-70 90-70s40 54 90 54" fill="none" stroke="var(--art-line)" stroke-width="12" stroke-linecap="round" />
+                <path d="M30 112c40 0 40-70 90-70s40 54 90 54" fill="none" stroke="var(--art-ink)" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" />
+                <circle cx="30" cy="112" r="11" fill="var(--art-bg)" stroke="var(--art-ink)" stroke-width="5" />
+                <circle cx="120" cy="42" r="11" fill="var(--art-bg)" stroke="var(--art-ink)" stroke-width="5" />
+                <circle cx="210" cy="96" r="11" fill="var(--art-bg)" stroke="var(--art-ink)" stroke-width="5" />
+                <rect x="140" y="104" width="52" height="26" rx="7" fill="var(--art-a)" />
+                <rect x="146" y="109" width="12" height="9" rx="2" fill="var(--art-bg)" />
+                <rect x="162" y="109" width="12" height="9" rx="2" fill="var(--art-bg)" />
+                <rect x="178" y="109" width="9" height="9" rx="2" fill="var(--art-bg)" />
+              </svg>
+            )}
+            {part.art === "plan" && (
+              <svg viewBox="0 0 240 150" focusable="false">
+                <path d="M0 46h240M0 104h240M64 0v150M176 0v150" stroke="var(--art-line)" stroke-width="2" opacity="0.7" />
+                <rect x="20" y="18" width="34" height="20" rx="4" fill="var(--art-a)" />
+                <rect x="186" y="18" width="36" height="20" rx="4" fill="var(--art-a)" />
+                <rect x="20" y="114" width="34" height="18" rx="4" fill="var(--art-a)" />
+                <rect x="186" y="114" width="36" height="18" rx="4" fill="var(--art-a)" />
+                <circle cx="120" cy="75" r="30" fill="var(--art-b)" />
+                <circle cx="120" cy="75" r="12" fill="var(--art-ink)" />
+                <rect x="72" y="56" width="20" height="38" rx="4" fill="var(--art-ink)" opacity="0.85" />
+              </svg>
+            )}
+          </div>
+          <h3 class="inhalt__card-title">{part.title}</h3>
+          <p class="inhalt__card-text">{part.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="inhalt__actions">
+    <PillLink href={pdfHref} label="Alles im PDF ansehen" variant="on-beige" download />
+    <a class="inhalt__link" href="/was-wird-gebaut">Was wird gebaut?</a>
+  </div>
+</section>
+
+<style>
+  .inhalt {
+    position: relative;
+    padding-inline: var(--gutter);
+    background: var(--beige);
+    color: var(--green);
+  }
+
+  .inhalt__head {
+    max-width: 44rem;
+  }
+
+  .inhalt__title {
+    margin: 0;
+    font-size: clamp(2.2rem, 9vw, 3.75rem);
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .inhalt__lead {
+    max-width: 34rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    font-weight: 600;
+    line-height: 1.38;
+    letter-spacing: -0.015em;
+  }
+
+  .inhalt__grid {
+    display: grid;
+    gap: clamp(0.85rem, 1.6vw, 1.25rem);
+    margin: clamp(1.75rem, 5vh, 2.75rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .inhalt__card {
+    --card-bg: var(--yellow);
+    --card-fg: var(--green);
+    --card-text: var(--green);
+    --art-bg: var(--yellow-light);
+    --art-line: #f7edc8;
+    --art-a: var(--sheet);
+    --art-b: #7dc1ea;
+    --art-ink: var(--green);
+    display: flex;
+    flex-direction: column;
+    padding: clamp(0.75rem, 1.4vw, 1rem) clamp(0.75rem, 1.4vw, 1rem) clamp(1.35rem, 2.4vw, 1.85rem);
+    border-radius: clamp(1.5rem, 2.6vw, 2.25rem);
+    background: var(--card-bg);
+    color: var(--card-fg);
+  }
+
+  .inhalt__card--blue {
+    --card-bg: #7dc1ea;
+    --card-fg: #0d3550;
+    --card-text: #0d3550;
+    --art-bg: #b9def5;
+    --art-line: #e2f2fc;
+    --art-a: var(--yellow);
+    --art-b: var(--sheet);
+    --art-ink: #0d3550;
+  }
+
+  .inhalt__card--purple {
+    --card-bg: var(--logo-purple);
+    --card-fg: var(--beige);
+    --card-text: rgb(245 241 228 / 0.9);
+    --art-bg: #b48ec6;
+    --art-line: #e7d9ee;
+    --art-a: var(--beige);
+    --art-b: var(--yellow);
+    --art-ink: #3d2149;
+  }
+
+  .inhalt__art {
+    overflow: hidden;
+    border-radius: clamp(1rem, 1.8vw, 1.5rem);
+    background: var(--art-bg);
+  }
+
+  .inhalt__art svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .inhalt__card-title {
+    margin: clamp(1rem, 2.4vh, 1.4rem) clamp(0.4rem, 1vw, 0.75rem) 0;
+    font-size: clamp(1.45rem, 2.1vw, 2rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  .inhalt__card-text {
+    margin: 0.55rem clamp(0.4rem, 1vw, 0.75rem) 0;
+    color: var(--card-text);
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    font-weight: 600;
+    line-height: 1.38;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+  }
+
+  .inhalt__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: clamp(1.5rem, 4vh, 2.25rem);
+  }
+
+  .inhalt__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--green);
+    font-size: clamp(0.9375rem, 1.05vw, 1.0625rem);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  .inhalt__link:hover,
+  .inhalt__link:focus-visible {
+    color: var(--green-light);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .inhalt__card {
+      transition: transform 0.45s var(--ease-out);
+    }
+
+    .inhalt__card:hover {
+      transform: translate3d(0, -0.4rem, 0);
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .inhalt__card {
+        animation: inhalt-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 60%;
+      }
+    }
+  }
+
+  @keyframes inhalt-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.5rem, 0);
+    }
+  }
+
+  @media (min-width: 760px) {
+    .inhalt__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .inhalt__card {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .inhalt__card {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

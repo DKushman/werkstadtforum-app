@@ -1,0 +1,305 @@
+---
+import PillLink from "./PillLink.astro";
+
+const steps = [
+  {
+    num: "01",
+    title: "Impuls",
+    text: "Fachleute haben in ein Thema eingeführt.",
+  },
+  {
+    num: "02",
+    title: "Thementisch",
+    text: "Danach haben alle in Gruppen darüber diskutiert.",
+  },
+  {
+    num: "03",
+    title: "Thesen",
+    text: "Die wichtigsten Aussagen wurden festgehalten.",
+  },
+  {
+    num: "04",
+    title: "Ziele",
+    text: "Daraus haben Fachleute und Moderation die 79 Ziele der Charta geschrieben.",
+  },
+] as const;
+---
+
+<section
+  class="charta-process"
+  id="so-ist-die-charta-entstanden"
+  aria-labelledby="charta-process-title"
+  style="--rail-p: 0"
+>
+  <div class="charta-process__head">
+    <h2 class="charta-process__title" id="charta-process-title">Vom Gespräch zum Plan.</h2>
+    <p class="charta-process__lead">
+      Die Charta 2040 ist unser gemeinsamer Plan für die City West. So haben wir sie erarbeitet:
+    </p>
+  </div>
+
+  <div class="charta-process__track">
+    <div class="charta-process__rail" aria-hidden="true">
+      <div class="charta-process__rail-fill"></div>
+    </div>
+
+    <p class="visually-hidden" id="charta-process-hint">
+      Vier Schritte: Klick oder Enter wählt einen Schritt, Pfeiltasten wechseln zwischen den Schritten.
+    </p>
+
+    <ol class="charta-process__steps" aria-describedby="charta-process-hint">
+      {
+        steps.map((step, index) => (
+          <li
+            class="charta-process__step"
+            style={`--i: ${index}`}
+            tabindex={index === 0 ? 0 : -1}
+            aria-current={index === 0 ? "step" : "false"}
+            aria-label={`Schritt ${step.num}: ${step.title}`}
+          >
+            <span class="charta-process__num" aria-hidden="true">
+              {step.num}
+            </span>
+            <article class="charta-process__card" aria-labelledby={`charta-step-${step.num}`}>
+              <h3 class="charta-process__card-title" id={`charta-step-${step.num}`}>
+                {step.title}
+              </h3>
+              <p class="charta-process__card-text">{step.text}</p>
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="charta-process__cta">
+    <PillLink href="/charta" label="Die 79 Ziele ansehen" variant="on-beige" />
+  </div>
+</section>
+
+<script>
+  import "../scripts/charta-process";
+</script>
+
+<style>
+  .charta-process {
+    position: relative;
+    z-index: 1;
+    padding: clamp(2.25rem, 7vh, 4rem) var(--gutter) clamp(3rem, 10vh, 5rem);
+    background: var(--beige);
+    color: var(--green);
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+
+  .charta-process__head {
+    max-width: 36rem;
+  }
+
+  .charta-process__title {
+    margin: 0;
+    max-width: 14ch;
+    font-size: clamp(2rem, 8.5vw, 3rem);
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .charta-process__lead {
+    max-width: 34rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(0.9375rem, 2.6vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.38;
+    letter-spacing: -0.012em;
+  }
+
+  .charta-process__track {
+    position: relative;
+    max-width: 38rem;
+    margin: clamp(1.75rem, 5vh, 2.75rem) 0 0;
+  }
+
+  .charta-process__steps {
+    --step-rail: 2px;
+    --step-node: clamp(2.65rem, 10vw, 3.15rem);
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .charta-process__rail {
+    position: absolute;
+    top: calc(var(--step-node) / 2);
+    bottom: calc(var(--step-node) / 2);
+    left: calc(var(--step-node) / 2 - var(--step-rail) / 2);
+    width: var(--step-rail);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--green) 18%, transparent);
+    pointer-events: none;
+  }
+
+  .charta-process__rail-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--green);
+    transform-origin: top center;
+    transform: scaleY(var(--rail-p, 0));
+    transition: transform 0.45s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .charta-process__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--step-node) minmax(0, 1fr);
+    column-gap: clamp(0.85rem, 3vw, 1.15rem);
+    align-items: start;
+    padding-bottom: clamp(1.35rem, 3.8vh, 2rem);
+    cursor: pointer;
+    border-radius: 0.65rem;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .charta-process__step:last-child {
+    padding-bottom: 0;
+  }
+
+  .charta-process__step:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 4px;
+  }
+
+  .charta-process__num {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: var(--step-node);
+    height: var(--step-node);
+    border: 2px solid var(--green);
+    border-radius: 0.55rem;
+    background: var(--beige);
+    font-size: clamp(0.95rem, 3.2vw, 1.05rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    transition:
+      background 0.25s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      color 0.25s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      transform 0.25s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      border-color 0.25s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .charta-process__card {
+    min-width: 0;
+    padding: 0.35rem 0 0.15rem;
+    transition:
+      opacity 0.35s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      transform 0.35s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .charta-process.is-ready .charta-process__step:not(.is-seen) .charta-process__card {
+    opacity: 0.42;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+
+  .charta-process.is-ready .charta-process__step.is-seen:not(.is-active) .charta-process__card {
+    opacity: 0.72;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .charta-process__step.is-active .charta-process__card {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .charta-process__step.is-passed .charta-process__num,
+  .charta-process__step.is-active .charta-process__num {
+    background: var(--green);
+    color: var(--beige);
+  }
+
+  .charta-process__step.is-active .charta-process__num {
+    transform: scale(1.06);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .charta-process__step:hover:not(.is-active) .charta-process__num {
+      transform: scale(1.03);
+      background: color-mix(in srgb, var(--green) 12%, var(--beige));
+    }
+
+    .charta-process__step.is-passed:hover .charta-process__num,
+    .charta-process__step.is-active:hover .charta-process__num {
+      background: var(--green);
+    }
+
+    .charta-process__step:hover .charta-process__card {
+      opacity: 1;
+    }
+  }
+
+  .charta-process__card-title {
+    margin: 0;
+    font-size: clamp(1.35rem, 4.8vw, 1.75rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    transition: color 0.25s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .charta-process__step.is-active .charta-process__card-title {
+    color: var(--green);
+  }
+
+  .charta-process__card-text {
+    margin: 0.45rem 0 0;
+    max-width: 32rem;
+    color: var(--text);
+    font-size: clamp(0.9375rem, 2.5vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+  }
+
+  .charta-process__cta {
+    margin-top: clamp(1.75rem, 5vh, 2.75rem);
+  }
+
+  @media (min-width: 720px) {
+    .charta-process__head {
+      max-width: 42rem;
+    }
+
+    .charta-process__track {
+      max-width: 44rem;
+    }
+
+    .charta-process__title {
+      max-width: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .charta-process__rail-fill,
+    .charta-process__num,
+    .charta-process__card {
+      transition: none;
+    }
+
+    .charta-process.is-ready .charta-process__step .charta-process__card {
+      opacity: 1;
+      transform: none;
+    }
+
+    .charta-process__step.is-active .charta-process__num {
+      transform: none;
+    }
+  }
+</style>

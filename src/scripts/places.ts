@@ -1,3 +1,5 @@
+export {};
+
 /**
  * „Wo und was wird gebaut?“
  * Desktop: Akkordeon (erster Ort offen, immer genau einer), Höhe = Karte.

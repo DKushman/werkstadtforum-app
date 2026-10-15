@@ -1,0 +1,73 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import PageHero from "../components/PageHero.astro";
+import PillLink from "../components/PillLink.astro";
+import WerZahlenSection from "../components/WerZahlenSection.astro";
+import WerNetzSection from "../components/WerNetzSection.astro";
+import WerTeamSection from "../components/WerTeamSection.astro";
+import WerKuratoriumSection from "../components/WerKuratoriumSection.astro";
+import WerInitiatorenSection from "../components/WerInitiatorenSection.astro";
+import WerTischSection from "../components/WerTischSection.astro";
+import WerPartnerSection from "../components/WerPartnerSection.astro";
+import MitmachenSection from "../components/MitmachenSection.astro";
+import ForumBridgeLine from "../components/ForumBridgeLine.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import radfahrer from "../assets/hero/radfahrer.webp";
+
+const title = "Wer ist dabei? – WerkStadtForum";
+const description =
+  "Politik, Verwaltung, Eigentümer, Handel, Kultur, Wissenschaft und Kirchen: Wer im WerkStadtForum an einem Tisch sitzt.";
+const lead =
+  "Politik, Verwaltung, Eigentümer, Handel, Kultur, Wissenschaft und Kirchen: Im WerkStadtForum sitzen Menschen zusammen, die sich sonst selten an einem Tisch begegnen. Hier siehst du, wer sie sind.";
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Wer ist dabei?",
+  description,
+  url: canonical.href,
+  inLanguage: "de-DE",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "WerkStadtForum",
+    url: Astro.site?.href ?? "https://werkstadtforum.de/",
+  },
+};
+---
+
+<Base title={title} description={description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+  <Nav />
+  <div class="page-sheet">
+    <main>
+      <PageHero
+        title={["Wer ist dabei?"]}
+        sub="Ein ziemlich voller Tisch."
+        lead={lead}
+        image={radfahrer}
+        flip
+        wide
+      >
+        <Fragment slot="actions">
+          <PillLink href="#netzwerk" label="Zum Netzwerk" variant="on-beige" />
+        </Fragment>
+        <WerZahlenSection slot="sheet" />
+      </PageHero>
+      <WerNetzSection />
+      <WerTeamSection />
+      <WerKuratoriumSection />
+      <WerInitiatorenSection />
+      <WerTischSection />
+      <div class="forum-bridge" data-worum-bridge style="--bridge-color: #b4e69a">
+        <ForumBridgeLine />
+        <WerPartnerSection />
+        <MitmachenSection />
+      </div>
+    </main>
+  </div>
+  <SiteFooter />
+</Base>

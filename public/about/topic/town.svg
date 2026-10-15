@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" focusable="false" aria-hidden="true">
+  <rect fill="#1b4a14" x="0" y="90" width="200" height="10" />
+  <rect fill="#1b4a14" x="106" y="4" width="2" height="12" />
+  <rect fill="#1b4a14" x="84" y="14" width="46" height="76" />
+  <path fill="#7cc1ea" d="M91 22h12v12H91zM111 22h12v12h-12zM91 42h12v12H91zM111 42h12v12h-12zM91 62h12v12H91zM111 62h12v12h-12z" />
+  <rect fill="#fdfbf5" x="12" y="50" width="60" height="40" />
+  <rect fill="#1b4a14" x="56" y="28" width="8" height="14" />
+  <path fill="#8e5aa6" d="M42 20 4 52h76z" />
+  <path fill="#7cc1ea" d="M22 58h12v12H22zM50 58h12v12H50z" />
+  <rect fill="#3b3a33" x="35" y="68" width="14" height="22" />
+  <rect fill="#1a5f8a" x="142" y="44" width="54" height="46" />
+  <rect fill="#e9cb6f" x="150" y="48" width="38" height="6" rx="2" />
+  <rect fill="#7cc1ea" x="148" y="70" width="24" height="14" />
+  <rect fill="#fdfbf5" x="178" y="70" width="12" height="20" />
+</svg>

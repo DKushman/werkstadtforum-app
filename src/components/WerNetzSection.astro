@@ -1,0 +1,443 @@
+---
+// „Vom Kern bis zu dir.“ – Halbkreis-Bögen hintereinander (wie ein Amphitheater), reines HTML/CSS.
+// Bögen sind Links zur passenden Sektion. Mit Maus: Hover hebt den Bogen hervor und zeigt die
+// Erklärung unter dem Halbkreis. Ohne Hover (Handy): alle Erklärungen als Liste.
+const rings = [
+  { id: "projektleitung", href: "#team", label: "Projektleitung", count: null, text: "Organisiert, moderiert und hält alles zusammen.", tone: "core" },
+  { id: "kuratorium", href: "#kuratorium", label: "Kuratorium", count: "17 Fachleute", text: "Fachleute, die die Arbeit ehrenamtlich begleiten und die Charta weiterschreiben.", tone: "green" },
+  { id: "initiatoren", href: "#initiatoren", label: "Initiatoren und Partner", count: "5 Initiatoren", text: "Haben das Forum angestoßen und tragen es.", tone: "yellow" },
+  { id: "am-tisch", href: "#am-tisch", label: "Am Tisch", count: "65+ Mitglieder", text: "Menschen aus Politik, Verwaltung, Wirtschaft, Kultur und Wissenschaft, die zu den Foren vor Ort eingeladen werden.", tone: "blue" },
+  { id: "online", href: "#online", label: "Online", count: "alle", text: "Alle, die im Forum mitreden. Also du.", tone: "open" },
+] as const;
+---
+
+<section class="netz" id="netzwerk" aria-labelledby="netz-title">
+  <div class="netz__head">
+    <h2 class="netz__title" id="netz-title">Vom Kern bis zu dir.</h2>
+    <p class="netz__lead">Das WerkStadtForum ist wie ein Kreis aufgebaut. Je weiter außen, desto mehr Menschen.</p>
+  </div>
+
+  <div class="netz__figure">
+    <ol class="netz__arcs" aria-label="Aufbau des WerkStadtForums, von innen nach außen">
+      {
+        rings.map((ring, i) => (
+          <li class="netz__arc-li">
+            <a class:list={["netz__arc", `netz__arc--${ring.id}`, `tone--${ring.tone}`]} href={ring.href} style={`--i: ${i}`}>
+              <span class="netz__label">
+                <span class="netz__name">{ring.label}</span>
+              </span>
+              <span class="visually-hidden">: {ring.text}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Erklärung (visuell; Screenreader lesen die Texte in den Links) -->
+    <div class="netz__panel" aria-hidden="true">
+      <p class="netz__hint">Zeig auf einen Bogen.</p>
+      <ol class="netz__list">
+        {
+          rings.map((ring) => (
+            <li class:list={["netz__item", `netz__item--${ring.id}`, `tone--${ring.tone}`]}>
+              <span class="netz__dot" />
+              <span class="netz__item-body">
+                <span class="netz__item-title">
+                  {ring.label}
+                  {ring.count ? <span class="netz__item-count">{ring.count}</span> : null}
+                </span>
+                <span class="netz__item-text">{ring.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .netz {
+    --round: clamp(1.5rem, 3.2vw, 2.75rem);
+    position: relative;
+    z-index: 4; /* runde Ecken über der steingrauen Fläche (z 3) */
+    margin-top: calc(var(--round) * -1);
+    padding-inline: var(--gutter);
+    border-radius: var(--round) var(--round) 0 0;
+    background: var(--beige);
+    color: var(--green);
+    scroll-margin-top: 4rem;
+  }
+
+  /* Bogenfarben */
+  .tone--core {
+    --arc-bg: var(--green);
+    --arc-fg: var(--forum-text);
+    --arc-count: rgb(205 240 163 / 0.8);
+  }
+
+  .tone--green {
+    --arc-bg: var(--sheet);
+    --arc-fg: #0f5c42;
+    --arc-count: rgb(15 92 66 / 0.75);
+  }
+
+  .tone--yellow {
+    --arc-bg: var(--yellow);
+    --arc-fg: var(--green);
+    --arc-count: rgb(27 74 20 / 0.7);
+  }
+
+  .tone--blue {
+    --arc-bg: #7dc1ea;
+    --arc-fg: #0d3550;
+    --arc-count: rgb(13 53 80 / 0.7);
+  }
+
+  .tone--open {
+    --arc-bg: #e9e3d3;
+    --arc-fg: var(--green);
+    --arc-count: rgb(27 74 20 / 0.6);
+  }
+
+  .netz__head {
+    max-width: 44rem;
+  }
+
+  .netz__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .netz__lead {
+    max-width: 30rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    font-weight: 600;
+    line-height: 1.38;
+    letter-spacing: -0.015em;
+  }
+
+  .netz__figure {
+    width: min(100%, 60rem);
+    margin: clamp(2rem, 6vh, 3.5rem) auto 0;
+  }
+
+  /* ——— Halbkreis: fünf Scheiben mit Mittelpunkt auf der Grundlinie, untere Hälfte abgeschnitten ——— */
+  .netz__arcs {
+    --step: 18; /* Radius-Schritt in % der Gesamtbreite/2 */
+    position: relative;
+    aspect-ratio: 2 / 1;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* schneidet die untere Hälfte ab – auch für Klicks */
+    list-style: none;
+    container-type: inline-size;
+  }
+
+  .netz__arc-li {
+    display: contents;
+  }
+
+  .netz__arc {
+    /* Durchmesser: 28 %, 46 %, 64 %, 82 %, 100 % der Breite */
+    --d: calc(28% + var(--i) * 18%);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    z-index: calc(10 - var(--i));
+    display: block;
+    width: var(--d);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--arc-bg);
+    color: var(--arc-fg);
+    text-decoration: none;
+    transform: translate(-50%, 50%);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Abdunkeln beim Hover über eine beige Schicht (statt opacity: so scheinen
+     dahinterliegende Bögen nicht durch und die Farben bleiben sauber) */
+  .netz__arc::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    background: var(--beige);
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out);
+    pointer-events: none;
+  }
+
+  /* „Online“: offener äußerer Bogen mit gestrichelter Kante – nach außen offen */
+  .netz__arc--online {
+    box-shadow: inset 0 0 0 2px rgb(27 74 20 / 0.28);
+  }
+
+  .netz__arc--online::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border: 2px dashed rgb(27 74 20 / 0.35);
+    border-radius: 50%;
+  }
+
+  /* Beschriftung mittig oben im eigenen Bogenband (Band = 9 % der Breite) */
+  .netz__label {
+    position: absolute;
+    top: 4.5cqw;
+    left: 50%;
+    display: grid;
+    justify-items: center;
+    gap: 0.15em;
+    width: max-content;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .netz__arc--projektleitung .netz__label {
+    top: calc(50% - 5.5cqw);
+  }
+
+  .netz__name {
+    font-size: 0.72rem;
+    font-size: clamp(0.72rem, 2.4cqw, 1.15rem);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1;
+  }
+
+  .netz__arc:focus-visible {
+    outline: 3px solid var(--green);
+    outline-offset: -6px;
+  }
+
+  /* ——— Erklärung: ohne Hover (Handy) als Liste aller Bögen ——— */
+  .netz__panel {
+    margin-top: clamp(1.5rem, 4vh, 2.25rem);
+  }
+
+  .netz__hint {
+    display: none;
+  }
+
+  .netz__list {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .netz__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.85rem;
+    align-items: start;
+  }
+
+  .netz__dot {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    border-radius: 50%;
+    background: var(--arc-bg);
+    box-shadow: inset 0 0 0 1.5px rgb(27 74 20 / 0.25);
+  }
+
+  .netz__item-body {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .netz__item-title {
+    display: grid;
+    gap: 0.2rem;
+    font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .netz__item-count {
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .netz__item-text {
+    max-width: 34rem;
+    color: var(--text);
+    font-size: clamp(0.95rem, 1.1vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.42;
+  }
+
+  /* ——— Mit Maus: Bogen hervorheben, Erklärung zentriert unter dem Halbkreis ——— */
+  @media (hover: hover) and (pointer: fine) {
+    .netz__panel {
+      display: grid;
+      justify-items: center;
+      min-height: 7.5rem;
+      text-align: center;
+    }
+
+    .netz__hint,
+    .netz__list {
+      grid-area: 1 / 1;
+    }
+
+    .netz__hint {
+      display: block;
+      align-self: center;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 700;
+      transition: opacity 0.25s var(--ease-out);
+    }
+
+    .netz__list {
+      display: grid;
+      width: 100%;
+    }
+
+    .netz__item {
+      grid-area: 1 / 1;
+      grid-template-columns: 1fr;
+      justify-items: center;
+      row-gap: 0.6rem;
+      opacity: 0;
+      transform: translate3d(0, 0.5rem, 0);
+      transition:
+        opacity 0.25s var(--ease-out),
+        transform 0.35s var(--ease-out);
+    }
+
+    .netz__item-body {
+      justify-items: center;
+    }
+
+    .netz__item-title {
+      justify-items: center;
+      font-size: clamp(1.5rem, 2.4vw, 2.2rem);
+      line-height: 1;
+    }
+
+    .netz__item-text {
+      font-size: clamp(1.05rem, 1.3vw, 1.25rem);
+      text-wrap: balance;
+    }
+
+    .netz__item .netz__dot {
+      width: 1.6rem;
+      height: 1.6rem;
+      margin: 0;
+    }
+
+    .netz__arcs:has(.netz__arc:hover, .netz__arc:focus-visible) .netz__arc:not(:hover, :focus-visible)::after {
+      opacity: 0.72;
+    }
+
+    .netz__figure:has(.netz__arc:hover, .netz__arc:focus-visible) .netz__hint {
+      opacity: 0;
+    }
+
+    .netz__figure:has(.netz__arc--projektleitung:hover, .netz__arc--projektleitung:focus-visible) .netz__item--projektleitung,
+    .netz__figure:has(.netz__arc--kuratorium:hover, .netz__arc--kuratorium:focus-visible) .netz__item--kuratorium,
+    .netz__figure:has(.netz__arc--initiatoren:hover, .netz__arc--initiatoren:focus-visible) .netz__item--initiatoren,
+    .netz__figure:has(.netz__arc--am-tisch:hover, .netz__arc--am-tisch:focus-visible) .netz__item--am-tisch,
+    .netz__figure:has(.netz__arc--online:hover, .netz__arc--online:focus-visible) .netz__item--online {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* Einblenden: Bögen steigen nacheinander von der Grundlinie auf (CSS, nur transform/opacity) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .netz__arcs {
+        view-timeline: --netz block;
+      }
+
+      .netz__arc {
+        animation: netz-rise linear both;
+        animation-timeline: --netz;
+        animation-range: entry calc(15% + var(--i) * 9%) entry calc(55% + var(--i) * 9%);
+      }
+    }
+  }
+
+  @keyframes netz-rise {
+    from {
+      transform: translate(-50%, 70%) scale(0.85);
+    }
+    to {
+      transform: translate(-50%, 50%) scale(1);
+    }
+  }
+
+  /* Handy: kleinere Schrift, in den Bögen und in der Liste */
+  @media (max-width: 639px) {
+    .netz__name {
+      font-size: 0.56rem;
+      font-size: clamp(0.54rem, 2.3cqw, 0.72rem);
+    }
+
+    .netz__arc--projektleitung .netz__label {
+      top: calc(50% - 5cqw);
+    }
+
+    .netz__list {
+      gap: 0.6rem;
+    }
+
+    .netz__item {
+      column-gap: 0.65rem;
+    }
+
+    .netz__dot {
+      width: 0.75rem;
+      height: 0.75rem;
+      margin-top: 0.12rem;
+    }
+
+    .netz__item-title {
+      gap: 0.1rem;
+      font-size: 0.875rem;
+    }
+
+    .netz__item-count {
+      font-size: 0.62rem;
+    }
+
+    .netz__item-text {
+      font-size: 0.8125rem;
+      line-height: 1.38;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .netz__arc::after,
+    .netz__item,
+    .netz__hint {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .netz__arc {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

@@ -1,0 +1,408 @@
+---
+import { Image } from "astro:assets";
+import PillLink from "./PillLink.astro";
+import logoBezirk from "../assets/logos/web/bezirk.png";
+import logoAgCity from "../assets/logos/web/ag-city.png";
+import logoIhk from "../assets/logos/web/ihk-berlin.png";
+import logoVbki from "../assets/logos/web/vbki.png";
+import logoWerkbund from "../assets/logos/web/werkbund-berlin.png";
+
+const partners = [
+  { src: logoBezirk, alt: "Bezirksamt Charlottenburg-Wilmersdorf" },
+  { src: logoAgCity, alt: "AG City" },
+  { src: logoIhk, alt: "IHK Berlin" },
+  { src: logoVbki, alt: "VBKI" },
+  { src: logoWerkbund, alt: "Werkbund Berlin" },
+] as const;
+---
+
+<section class="organisiert" id="wer-dahinter" aria-labelledby="organisiert-title">
+  <div class="organisiert__card">
+    <div class="organisiert__grid">
+      <div class="organisiert__intro">
+        <h2 class="organisiert__title" id="organisiert-title">Und wer organisiert das?</h2>
+        <p class="organisiert__fine">
+          Getragen wird das Forum von Verbänden und privaten Partnern aus der City West.
+        </p>
+        <div class="organisiert__actions">
+          <PillLink href="/wer-ist-dabei" label="Alle Gesichter ansehen" variant="on-beige" />
+          <a class="organisiert__link" href="/kontakt">Projektleitung kontaktieren</a>
+        </div>
+      </div>
+
+      <article
+        class="organisiert__panel organisiert__panel--team"
+        style="--i: 0"
+        aria-labelledby="organisiert-team"
+      >
+        <div class="organisiert__media">
+          <div class="organisiert__duo" aria-hidden="true">
+            <img
+              class="organisiert__duo-photo organisiert__duo-photo--back"
+              src="/images/wolf.png"
+              alt=""
+              width="400"
+              height="400"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="organisiert__duo-photo organisiert__duo-photo--front"
+              src="/images/caroline lehmann.png"
+              alt=""
+              width="400"
+              height="400"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <p class="visually-hidden">Caroline Lehmann und Wolf Uwe Rilke</p>
+        </div>
+        <h3 class="organisiert__row-title" id="organisiert-team">Caroline Lehmann & Wolf Uwe Rilke</h3>
+        <p class="organisiert__row-text">
+          Organisiert und moderiert wird es von Caroline Lehmann und Wolf Uwe Rilke.
+        </p>
+      </article>
+
+      <article
+        class="organisiert__panel organisiert__panel--kuratorium"
+        style="--i: 1; --ring: #c9a227; --ring-bg: #faf0d4"
+        aria-labelledby="organisiert-kuratorium"
+      >
+        <div class="organisiert__media">
+          <div class="organisiert__avatar" aria-hidden="true">
+            <img
+              class="organisiert__face"
+              src="/characters/heads/kulturfreigeist.webp"
+              alt=""
+              width="360"
+              height="360"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+        <h3 class="organisiert__row-title" id="organisiert-kuratorium">Ehrenamtliches Kuratorium</h3>
+        <p class="organisiert__row-text">
+          Fachlich begleitet wird es von einem Kuratorium, einem Kreis von Fachleuten aus Architektur,
+          Handel, Kultur und anderen Bereichen, die das ehrenamtlich machen.
+        </p>
+      </article>
+
+      <article
+        class="organisiert__panel organisiert__panel--partners"
+        style="--i: 2"
+        aria-labelledby="organisiert-partners"
+      >
+        <div class="organisiert__media">
+          <ul class="organisiert__logo-row" aria-hidden="true">
+            {
+              partners.map((logo) => (
+                <li>
+                  <Image
+                    src={logo.src}
+                    alt=""
+                    widths={[120, 180, 240]}
+                    sizes="(min-width: 840px) 120px, 22vw"
+                    class="organisiert__logo"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </li>
+              ))
+            }
+          </ul>
+          <p class="visually-hidden">
+            {partners.map((logo) => logo.alt).join(", ")}
+          </p>
+        </div>
+        <h3 class="organisiert__row-title" id="organisiert-partners">Initiiert von Partnern der City West</h3>
+        <p class="organisiert__row-text">
+          Angestoßen haben das WerkStadtForum der Bezirk Charlottenburg-Wilmersdorf, die AG City, die
+          IHK Berlin, der VBKI und der Werkbund Berlin.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<script>
+  const section = document.querySelector<HTMLElement>(".organisiert");
+  const panels = section ? [...section.querySelectorAll<HTMLElement>(".organisiert__panel")] : [];
+
+  if (section && panels.length && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    section.classList.add("is-js");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-in");
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.12 },
+    );
+    panels.forEach((panel) => observer.observe(panel));
+  } else if (section) {
+    panels.forEach((panel) => panel.classList.add("is-in"));
+  }
+</script>
+
+<style>
+  .organisiert {
+    position: relative;
+    z-index: 1;
+    padding: clamp(2rem, 6vh, 3.5rem) var(--gutter) clamp(3rem, 10vh, 5.5rem);
+    background: var(--beige);
+    color: var(--ink);
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+
+  .organisiert__card {
+    width: 100%;
+    padding: clamp(0.65rem, 1.4vw, 0.85rem);
+    border-radius: clamp(1.35rem, 2.8vw, 2rem);
+    background: #fff;
+  }
+
+  .organisiert__grid {
+    display: grid;
+    gap: clamp(0.65rem, 1.4vw, 0.85rem);
+  }
+
+  .organisiert__intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: clamp(14rem, 42vw, 18rem);
+    padding: clamp(1.35rem, 3vw, 2rem);
+    border-radius: clamp(1.1rem, 2.2vw, 1.65rem);
+    background: var(--pill-bg);
+  }
+
+  .organisiert__title {
+    margin: 0;
+    max-width: 11ch;
+    color: var(--ink);
+    font-size: clamp(2rem, 8.5vw, 3rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .organisiert__fine {
+    max-width: 26rem;
+    margin: clamp(1rem, 2.4vh, 1.35rem) 0 0;
+    color: var(--muted);
+    font-size: clamp(0.8125rem, 2vw, 0.9375rem);
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  .organisiert__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(0.85rem, 2vh, 1.15rem);
+    margin-top: clamp(1.35rem, 3vh, 2rem);
+  }
+
+  .organisiert__link {
+    color: var(--green);
+    font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+  }
+
+  .organisiert__link:hover,
+  .organisiert__link:focus-visible {
+    color: var(--green-light);
+  }
+
+  .organisiert__panel {
+    display: flex;
+    flex-direction: column;
+    min-height: clamp(13rem, 38vw, 16rem);
+    padding: clamp(1.15rem, 2.6vw, 1.65rem);
+    border-radius: clamp(1.1rem, 2.2vw, 1.65rem);
+    background: var(--pill-bg);
+    opacity: 1;
+    transform: none;
+  }
+
+  .organisiert.is-js .organisiert__panel:not(.is-in) {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0);
+  }
+
+  .organisiert.is-js .organisiert__panel.is-in {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition:
+      opacity 0.45s var(--ease-out),
+      transform 0.45s var(--ease-out);
+    transition-delay: calc(var(--i) * 0.07s);
+  }
+
+  .organisiert__media {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(6.5rem, 22vw, 9rem);
+    margin-bottom: clamp(0.85rem, 2vh, 1.15rem);
+  }
+
+  .organisiert__duo {
+    position: relative;
+    width: clamp(6.5rem, 22vw, 8.75rem);
+    height: clamp(4.25rem, 14vw, 5.65rem);
+  }
+
+  .organisiert__duo-photo {
+    position: absolute;
+    top: 50%;
+    width: clamp(3.85rem, 12vw, 5rem);
+    height: clamp(3.85rem, 12vw, 5rem);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--green) 30%, transparent);
+    transform: translateY(-50%);
+  }
+
+  .organisiert__duo-photo--back {
+    left: 0;
+    z-index: 1;
+  }
+
+  .organisiert__duo-photo--front {
+    right: 0;
+    z-index: 2;
+  }
+
+  .organisiert__avatar {
+    display: grid;
+    place-items: center;
+    width: clamp(4.75rem, 15vw, 6.25rem);
+    height: clamp(4.75rem, 15vw, 6.25rem);
+    padding: 0.3rem;
+    border: 3px solid var(--ring);
+    border-radius: 50%;
+    background: var(--ring-bg);
+  }
+
+  .organisiert__face {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .organisiert__logo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.65rem, 2vw, 1.25rem);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .organisiert__logo {
+    display: block;
+    width: auto;
+    height: clamp(1.85rem, 5vw, 2.75rem);
+    object-fit: contain;
+  }
+
+  .organisiert__row-title {
+    margin: 0;
+    color: var(--green);
+    font-size: clamp(1.25rem, 3.6vw, 1.65rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .organisiert__row-text {
+    margin: 0.4rem 0 0;
+    color: var(--text);
+    font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+  }
+
+  @media (min-width: 840px) {
+    .organisiert__grid {
+      grid-template-columns: minmax(0, 0.44fr) minmax(0, 0.28fr) minmax(0, 0.28fr);
+      grid-template-rows: minmax(0, 1fr) auto;
+      align-items: stretch;
+    }
+
+    .organisiert__intro {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      min-height: 0;
+    }
+
+    .organisiert__panel--team {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .organisiert__panel--kuratorium {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .organisiert__panel--partners {
+      grid-column: 2 / span 2;
+      grid-row: 2;
+    }
+
+    .organisiert__panel--partners .organisiert__media {
+      min-height: clamp(5rem, 12vw, 7rem);
+    }
+
+    .organisiert__title {
+      font-size: clamp(2.15rem, 2.8vw, 3rem);
+    }
+
+    .organisiert__row-title {
+      font-size: clamp(1.35rem, 1.65vw, 1.75rem);
+    }
+
+    .organisiert__logo {
+      height: clamp(2rem, 2.8vw, 2.85rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .organisiert.is-js .organisiert__panel:not(.is-in),
+    .organisiert.is-js .organisiert__panel.is-in {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .organisiert__card,
+    .organisiert__intro,
+    .organisiert__panel {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

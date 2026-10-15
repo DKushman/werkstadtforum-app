@@ -1,0 +1,161 @@
+---
+// Hochfahrende Fläche nach dem „Wer ist dabei?“-Hero: das Forum in Zahlen, über die volle Breite.
+const stats = [
+  { kicker: "Seit", value: "2019", text: "an einem Tisch" },
+  { value: "65+", text: "Mitglieder bei den Foren vor Ort" },
+  { value: "17", text: "Fachleute im Kuratorium" }, // Zahl noch zu bestätigen
+  { value: "5", text: "Initiatoren" },
+] as const;
+---
+
+<section class="rise-sheet wer-zahlen" slot="sheet" id="zahlen" aria-labelledby="wer-zahlen-title" data-nav-dark>
+  <div class="wer-zahlen__content">
+    <h2 class="visually-hidden" id="wer-zahlen-title">Das WerkStadtForum in Zahlen</h2>
+    <ul class="wer-zahlen__row">
+      {
+        stats.map((stat, i) => (
+          <li class="wer-zahlen__item" style={`--i: ${i}`}>
+            <p class="wer-zahlen__value">
+              {/* Kicker-Zeile bei allen gleich hoch, damit die Zahlen auf einer Linie stehen */}
+              <span class="wer-zahlen__kicker">{"kicker" in stat ? stat.kicker : "\u00a0"}</span>
+              <span class="wer-zahlen__num">{stat.value}</span>
+            </p>
+            <p class="wer-zahlen__text">{stat.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .wer-zahlen {
+    --sheet-bg: var(--green);
+    --sheet-fg: var(--beige);
+    --rule: rgb(245 241 228 / 0.22);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wer-zahlen__content {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    padding: clamp(6.5rem, 22vh, 11rem) var(--gutter) clamp(3rem, 9vh, 5rem);
+  }
+
+  /* Mobil 2 × 2, ab 900 px vier Spalten über die volle Breite, getrennt durch feine Linien */
+  .wer-zahlen__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1.5px solid var(--rule);
+  }
+
+  .wer-zahlen__item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: clamp(1.25rem, 3vh, 2rem) clamp(0.75rem, 2vw, 1.5rem) clamp(1.5rem, 4vh, 2.5rem) 0;
+    border-bottom: 1.5px solid var(--rule);
+    container-type: inline-size;
+  }
+
+  .wer-zahlen__item:nth-child(even) {
+    padding-left: clamp(0.75rem, 2vw, 1.5rem);
+    border-left: 1.5px solid var(--rule);
+  }
+
+  .wer-zahlen__value {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    overflow: hidden;
+    padding-bottom: 0.04em;
+  }
+
+  .wer-zahlen__kicker {
+    font-size: clamp(1rem, 1.5vw, 1.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .wer-zahlen__num {
+    display: block;
+    width: fit-content;
+    font-size: clamp(3.4rem, 15vw, 6rem);
+    font-size: clamp(3.2rem, 46cqi, 11rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.88;
+    letter-spacing: -0.065em;
+    white-space: nowrap;
+  }
+
+  .wer-zahlen__text {
+    max-width: 16rem;
+    margin: auto 0 0;
+    padding-top: clamp(0.85rem, 2vh, 1.25rem);
+    font-size: clamp(0.975rem, 1.25vw, 1.2rem);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  @media (min-width: 900px) {
+    .wer-zahlen__content {
+      padding-top: calc(var(--about-nav) + clamp(1.5rem, 6vh, 4rem));
+    }
+
+    .wer-zahlen__row {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .wer-zahlen__item,
+    .wer-zahlen__item:nth-child(even) {
+      padding: clamp(1.5rem, 4vh, 2.5rem) clamp(1rem, 2vw, 2rem) clamp(2rem, 6vh, 3.5rem);
+      border-left: 1.5px solid var(--rule);
+    }
+
+    .wer-zahlen__item:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
+  /* Einblenden beim Hochfahren: reines CSS (scroll-driven), Zahlen steigen aus ihrer Maske */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .wer-zahlen__num {
+        animation: wer-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 70%;
+      }
+
+      .wer-zahlen__text,
+      .wer-zahlen__kicker {
+        animation: wer-fade linear both;
+        animation-timeline: view();
+        animation-range: entry 20% entry 80%;
+      }
+    }
+  }
+
+  @keyframes wer-rise {
+    from {
+      transform: translate3d(0, 100%, 0);
+    }
+  }
+
+  @keyframes wer-fade {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 0.75rem, 0);
+    }
+  }
+</style>

@@ -17,17 +17,8 @@ const partners = [
 
 const ways = [
   {
-    title: "Komm vorbei.",
-    text: "Vier Versammlungen im Jahr, offen für alle. Einfach bewerben und dazusetzen.",
-    href: "#termine",
-    cta: "Nächster Termin",
-    variant: "forum" as const,
-    tone: "brown" as const,
-    focus: "22% 40%",
-  },
-  {
     title: "Red mit.",
-    text: "Im Forum, wann du willst. Lesen geht ohne Anmeldung.",
+    text: "Lesen ohne Anmeldung. Mitreden mit kurzer Anmeldung per E-Mail, auf Wunsch anonym.",
     href: "#forum",
     cta: "Zum Forum",
     variant: "forum" as const,
@@ -70,7 +61,7 @@ const ways = [
                 width={800}
                 height={600}
                 widths={[400, 600, 800]}
-                sizes="(min-width: 900px) 28vw, 85vw"
+                sizes="(min-width: 900px) 30rem, 85vw"
                 loading="lazy"
                 decoding="async"
                 class="mitmachen__shot"
@@ -200,7 +191,8 @@ const ways = [
 
   @media (min-width: 900px) {
     .mitmachen__grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: min(64rem, 100%);
       align-items: stretch;
     }
   }

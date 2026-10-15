@@ -1,0 +1,111 @@
+---
+// Hochfahrende Fläche nach dem Charta-Hero: die Idee hinter der Charta.
+---
+
+<section class="rise-sheet charta-idee" slot="sheet" id="idee" aria-labelledby="idee-title">
+  <div class="charta-idee__content">
+    <h2 class="charta-idee__title" id="idee-title">Die offene Stadt.</h2>
+
+    <figure class="charta-idee__quote">
+      <blockquote class="charta-idee__blockquote">
+        <p>„Im Mittelpunkt aller Überlegungen steht der Mensch.“</p>
+      </blockquote>
+    </figure>
+
+    <p class="charta-idee__text">
+      Die City West soll offen sein für alle, die hier leben, arbeiten oder zu Besuch sind. Ein Ort, an
+      dem man sich wohl und zu Hause fühlt. Sozial ausgewogen und nachhaltig.
+    </p>
+  </div>
+</section>
+
+<style>
+  .charta-idee {
+    --sheet-bg: #7dc1ea;
+    --sheet-fg: var(--beige);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .charta-idee__content {
+    display: grid;
+    flex: 1 1 auto;
+    align-content: center;
+    gap: clamp(1.5rem, 4vh, 2.5rem);
+    padding: clamp(6.5rem, 22vh, 11rem) var(--gutter) clamp(3rem, 9vh, 5.5rem);
+  }
+
+  .charta-idee__title {
+    margin: 0;
+    font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .charta-idee__quote {
+    margin: 0;
+  }
+
+  .charta-idee__blockquote {
+    margin: 0;
+  }
+
+  .charta-idee__blockquote p {
+    max-width: 16ch;
+    margin: 0;
+    font-size: clamp(2.4rem, 10vw, 6.25rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+    /* hängende Anführungszeichen */
+    text-indent: -0.4em;
+    padding-left: 0.4em;
+  }
+
+  .charta-idee__text {
+    max-width: 36rem;
+    margin: 0;
+    font-size: clamp(1rem, 1.35vw, 1.3rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+  }
+
+  /* Einblenden beim Reinscrollen: reines CSS (scroll-driven), ohne Script */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .charta-idee__content > * {
+        animation: idee-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 65%;
+      }
+    }
+  }
+
+  @keyframes idee-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.5rem, 0);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .charta-idee__content {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.42fr);
+      column-gap: clamp(2rem, 6vw, 6rem);
+      padding-top: calc(var(--about-nav) + clamp(1.5rem, 6vh, 4rem));
+    }
+
+    .charta-idee__title,
+    .charta-idee__quote {
+      grid-column: 1 / -1;
+    }
+
+    .charta-idee__text {
+      grid-column: 2;
+    }
+  }
+
+</style>

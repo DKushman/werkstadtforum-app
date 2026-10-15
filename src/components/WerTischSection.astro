@@ -1,0 +1,203 @@
+---
+// „Wer am Tisch sitzt.“ – Chips werden beim Scrollen nacheinander abgehakt.
+// Reines CSS (scroll-driven), nur opacity/transform: zwei gestapelte Ebenen pro Chip
+// (aus = grau, an = grün mit Haken) werden überblendet. Ohne Unterstützung: alle abgehakt.
+const areas = [
+  "Politik im Bezirk",
+  "Verwaltung",
+  "Verbände und Vereine",
+  "Eigentümer und Immobilienwirtschaft",
+  "Handel",
+  "Kunst und Kultur",
+  "Wissenschaft",
+  "Kirchen und Gemeinden",
+] as const;
+---
+
+<section class="tisch" id="am-tisch" aria-labelledby="tisch-title">
+  <div class="tisch__head">
+    <h2 class="tisch__title" id="tisch-title">Wer am Tisch sitzt.</h2>
+    <p class="tisch__lead">
+      Zu den Foren vor Ort laden wir Menschen ein, die in der City West etwas bewegen können. Sie kommen aus diesen
+      Bereichen:
+    </p>
+  </div>
+
+  <ul class="tisch__chips">
+    {
+      areas.map((area, i) => (
+        <li class="chip" style={`--i: ${i}`}>
+          <span class="chip__off">
+            <span class="chip__off-text">{area}</span>
+          </span>
+          <span class="chip__on" aria-hidden="true">
+            <svg class="chip__check" viewBox="0 0 16 16" focusable="false">
+              <path d="M3 8.5 6.4 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            {area}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .tisch {
+    position: relative;
+    display: grid;
+    gap: clamp(1.75rem, 5vh, 2.75rem);
+    padding-inline: var(--gutter);
+    background: var(--beige);
+    color: var(--green);
+    scroll-margin-top: 4rem;
+  }
+
+  .tisch__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .tisch__lead {
+    max-width: 34rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+  }
+
+  .tisch__chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: start;
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Chip: beide Ebenen im selben Grid-Feld; die breitere (mit Haken) bestimmt die Größe */
+  .chip {
+    display: grid;
+    font-size: clamp(0.95rem, 1.35vw, 1.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .chip__off,
+  .chip__on {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55em;
+    min-height: 2.9em;
+    padding: 0.65em 1.15em;
+    border-radius: 0.95em;
+  }
+
+  .chip__off {
+    border: 2px solid rgb(27 74 20 / 0.16);
+    color: rgb(38 36 32 / 0.62);
+  }
+
+  /* „an“: grüne Kontur, zartes Grün, Haken. Standard (ohne Scroll-Animation): abgehakt */
+  .chip__on {
+    border: 2px solid var(--green);
+    background: #e3f2d6;
+    color: var(--green);
+  }
+
+  .chip__check {
+    width: 1em;
+    height: 1em;
+    flex: none;
+  }
+
+  /* Scroll-gekoppelt: Chips haken sich nacheinander ab, während die Liste durchs Bild läuft */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .tisch__chips {
+        view-timeline: --tisch block;
+      }
+
+      /* Longhands statt Kurzform: „both“ würde dort sonst als Animationsname gelesen */
+      .chip__off-text,
+      .chip__on,
+      .chip__check {
+        --start: calc(18vh + var(--i) * 5vh);
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --tisch;
+      }
+
+      /* erst grauer Text raus (Kontur bleibt), dann grüne Ebene rein: nie doppelter Text */
+      .chip__off-text {
+        animation-name: chip-off;
+        animation-range: cover var(--start) cover calc(var(--start) + 1.6vh);
+      }
+
+      .chip__on {
+        animation-name: chip-on;
+        animation-range: cover calc(var(--start) + 1.4vh) cover calc(var(--start) + 4vh);
+      }
+
+      .chip__check {
+        animation-name: chip-check;
+        animation-range: cover calc(var(--start) + 2vh) cover calc(var(--start) + 4.5vh);
+      }
+    }
+  }
+
+  @keyframes chip-off {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes chip-on {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes chip-check {
+    from {
+      transform: scale(0) rotate(-20deg);
+    }
+    to {
+      transform: scale(1) rotate(0);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .tisch {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      column-gap: clamp(2.5rem, 6vw, 6rem);
+      align-items: start;
+    }
+
+    .tisch__chips {
+      padding-top: 0.35rem;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .chip__off,
+    .chip__on {
+      border-color: CanvasText;
+    }
+  }
+</style>

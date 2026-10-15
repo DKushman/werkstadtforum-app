@@ -1,0 +1,61 @@
+<svg class="forum-bridge__line" aria-hidden="true" focusable="false">
+  <path class="forum-bridge__path" pathLength="1" fill="none"></path>
+</svg>
+
+<script>
+  import "../scripts/worum-bridge-line";
+  import "../scripts/people";
+</script>
+
+<style is:global>
+  .forum-bridge {
+    position: relative;
+    background: var(--beige);
+  }
+
+  /* Variante mit runden oberen Ecken über der vorherigen Fläche */
+  .forum-bridge--rounded {
+    --round: clamp(1.5rem, 3.2vw, 2.75rem);
+    z-index: 4;
+    margin-top: calc(var(--round) * -1);
+    border-radius: var(--round) var(--round) 0 0;
+  }
+
+  .forum-bridge .mitmachen {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Wie der letzte Abschnitt der People-Linie auf der Startseite:
+     Farbe der Scheibe, breiter Strich, hinter den Mitmachen-Karten */
+  .forum-bridge__line {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    color: var(--bridge-color, #5aaf72);
+    pointer-events: none;
+  }
+
+  .forum-bridge__path {
+    stroke: currentColor;
+    stroke-linecap: butt;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: var(--draw, 1);
+  }
+
+  @media (max-width: 639px) {
+    .forum-bridge__line {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .forum-bridge__path {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

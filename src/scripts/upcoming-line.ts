@@ -103,11 +103,20 @@ if (root && svg && nowEl && dotEl) {
     });
   };
 
+  // Scroll-Arbeit nur, solange die Section (plus Vorlauf) im Viewport ist
+  let near = false;
   const onScroll = () => {
-    if (queued) return;
+    if (queued || !near) return;
     queued = true;
     requestAnimationFrame(update);
   };
+  new IntersectionObserver(
+    ([entry]) => {
+      near = entry.isIntersecting;
+      if (near) onScroll();
+    },
+    { rootMargin: "25% 0px" },
+  ).observe(root);
 
   if (reduceMotion.matches) cards.forEach((card) => card.classList.add("is-inview"));
 

@@ -1,0 +1,273 @@
+---
+const rules = [
+  {
+    title: "Jede Meinung darf raus.",
+    text: "Niemand wird für seine Sicht angegriffen.",
+    tone: "yellow",
+  },
+  {
+    title: "Respekt zuerst.",
+    text: "Wir hören einander zu, auch wenn wir anderer Meinung sind.",
+    tone: "green",
+  },
+  {
+    title: "Bleib beim Thema.",
+    text: "Es geht um die City West, nicht um Personen.",
+    tone: "sheet",
+  },
+] as const;
+---
+
+<section class="regeln" id="regeln" aria-labelledby="regeln-title">
+  <div class="regeln__head">
+    <h2 class="regeln__title" id="regeln-title">
+      <span class="line-rise"><span>Streiten ja.</span></span>
+      <span class="line-rise" style="--rise-delay: 0.1s"><span>Aber anständig.</span></span>
+    </h2>
+    <p class="regeln__lead">Diese Regeln gelten bei uns, vor Ort und im Forum.</p>
+  </div>
+
+  <ol class="regeln__stack">
+    {
+      rules.map((rule, index) => (
+        <li class:list={["regeln__card", `regeln__card--${rule.tone}`]} style={`--i: ${index}`}>
+          <article class="regeln__inner" aria-labelledby={`regel-${index + 1}`}>
+            <span class="regeln__num" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3 class="regeln__card-title" id={`regel-${index + 1}`}>
+              {rule.title}
+            </h3>
+            <p class="regeln__card-text">{rule.text}</p>
+          </article>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .regeln {
+    /* Sticky-Kante unter der Nav; jede weitere Karte rastet etwas tiefer ein,
+       damit die Oberkanten der vorherigen Karten als farbige Streifen sichtbar bleiben */
+    --stack-top: calc(4.75rem + env(safe-area-inset-top, 0px));
+    --stack-step: 1rem;
+    --stack-gap: clamp(1rem, 3vh, 1.75rem);
+    --card-min: clamp(17rem, 52svh, 26rem);
+    position: relative;
+    z-index: 1;
+    padding-inline: var(--gutter);
+    background: var(--beige);
+    color: var(--green);
+  }
+
+  .regeln__head {
+    max-width: 40rem;
+  }
+
+  .regeln__title {
+    margin: 0;
+    font-size: clamp(2rem, 8.5vw, 3rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+  }
+
+  .regeln.is-js:not(.is-in) .line-rise > * {
+    animation-play-state: paused;
+  }
+
+  .regeln__lead {
+    max-width: 34rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(0.9375rem, 2.6vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.38;
+    letter-spacing: -0.012em;
+  }
+
+  .regeln__stack {
+    display: grid;
+    gap: var(--stack-gap);
+    margin: clamp(1.75rem, 5vh, 2.75rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Jede Karte klebt an ihrer Kante; die folgende schiebt sich darüber.
+     Reines position: sticky, kein Scroll-Listener. */
+  .regeln__card {
+    --card-bg: var(--yellow);
+    --card-fg: var(--green);
+    --card-text: rgb(27 74 20 / 0.82);
+    --num-bg: var(--green);
+    --num-fg: var(--beige);
+    position: sticky;
+    top: calc(var(--stack-top) + var(--i) * var(--stack-step));
+    min-height: var(--card-min);
+    border-radius: clamp(1.5rem, 3vw, 2.25rem);
+    background: var(--card-bg);
+    color: var(--card-fg);
+  }
+
+  /* Schatten als Pseudo-Element hinter der Karte (einmalig gemalt, Sticky-Ebene) */
+  .regeln__card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    box-shadow: 0 -0.5rem 2rem rgb(11 7 8 / 0.12);
+  }
+
+  .regeln__card--green {
+    --card-bg: var(--green);
+    --card-fg: var(--beige);
+    --card-text: rgb(245 241 228 / 0.84);
+    --num-bg: var(--yellow);
+    --num-fg: var(--green);
+  }
+
+  .regeln__card--sheet {
+    --card-bg: var(--sheet);
+    --card-fg: #0f5c42;
+    --card-text: rgb(15 92 66 / 0.86);
+    --num-bg: #0f5c42;
+    --num-fg: var(--sheet);
+  }
+
+  .regeln__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: inherit;
+    padding: clamp(1.25rem, 2.4vw, 2rem) clamp(1.25rem, 2.4vw, 2.25rem) clamp(1.35rem, 2.6vw, 2.25rem);
+  }
+
+  .regeln__num {
+    display: grid;
+    place-items: center;
+    width: clamp(2.15rem, 2.6vw, 2.7rem);
+    height: clamp(2.15rem, 2.6vw, 2.7rem);
+    border-radius: 0.42rem;
+    background: var(--num-bg);
+    color: var(--num-fg);
+    font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .regeln__card-title {
+    margin: clamp(1.5rem, 5vh, 3rem) 0 0;
+    max-width: 12ch;
+    font-size: clamp(2.1rem, 9vw, 3.1rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .regeln__card-text {
+    margin: auto 0 0;
+    padding-top: clamp(1.25rem, 3vh, 2rem);
+    max-width: 30rem;
+    color: var(--card-text);
+    font-size: clamp(1rem, 1.15vw, 1.1875rem);
+    font-weight: 500;
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+  }
+
+  /* Auslauf hinter der letzten Karte: genau so viel Scrollweg, dass auch sie
+     ihre Sticky-Kante erreicht, bevor die Liste endet */
+  .regeln__stack::after {
+    content: "";
+    height: max(2rem, calc(100vh - var(--stack-top) - 2 * var(--stack-step) - var(--card-min) - var(--section-pad)));
+    height: max(2rem, calc(100svh - var(--stack-top) - 2 * var(--stack-step) - var(--card-min) - var(--section-pad)));
+  }
+
+  @media (min-width: 900px) {
+    .regeln {
+      --stack-top: calc(clamp(0.65rem, 1.5vw, 1rem) * 2 + clamp(2.5rem, 3.4vw, 3.5rem) + 0.75rem);
+      --stack-step: 1.25rem;
+      --card-min: clamp(20rem, 58svh, 32rem);
+    }
+
+    .regeln__head {
+      max-width: 46rem;
+    }
+
+    .regeln__title {
+      font-size: clamp(2.4rem, 4.2vw, 3.75rem);
+    }
+
+    .regeln__inner {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      column-gap: clamp(1.25rem, 2.6vw, 2.5rem);
+      align-items: start;
+    }
+
+    .regeln__num {
+      grid-row: 1 / span 2;
+    }
+
+    .regeln__card-title {
+      margin-top: 0;
+      max-width: 14ch;
+      font-size: clamp(3rem, 5.2vw, 5.25rem);
+    }
+
+    .regeln__card-text {
+      grid-column: 2;
+      align-self: end;
+      max-width: 34rem;
+    }
+  }
+
+  /* Wenig Höhe (Querformat): kein Stapeln, Karten laufen normal durch */
+  @media (max-height: 520px) {
+    .regeln__card {
+      position: relative;
+      top: auto;
+      min-height: 0;
+    }
+
+    .regeln__stack::after {
+      display: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .regeln__card {
+      border: 1px solid CanvasText;
+    }
+
+    .regeln__num {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>(".regeln");
+  if (section) {
+    section.classList.add("is-js");
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      section.classList.add("is-in");
+    } else {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            section.classList.add("is-in");
+            observer.disconnect();
+          }
+        },
+        { rootMargin: "0px 0px -15% 0px", threshold: 0 },
+      );
+      observer.observe(section);
+    }
+  }
+</script>

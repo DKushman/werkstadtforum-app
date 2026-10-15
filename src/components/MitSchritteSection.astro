@@ -1,0 +1,202 @@
+---
+// „In drei Schritten dabei.“ – hochfahrende braune Fläche nach dem Mitmachen-Hero.
+const steps = [
+  {
+    nr: "01",
+    title: "Lesen",
+    text: "Das Kuratorium stellt regelmäßig neue Fragen zur City West. Lesen kannst du alles, ohne Anmeldung.",
+    icon: "read",
+  },
+  {
+    nr: "02",
+    title: "Abstimmen",
+    text: "Sag in einem Klick, wie du zu einer Aussage stehst: von „stimme gar nicht zu“ bis „stimme voll zu“.",
+    icon: "vote",
+  },
+  {
+    nr: "03",
+    title: "Kommentieren",
+    text: "Begründe deine Meinung oder antworte anderen. Mit kurzer Bestätigung per E-Mail.",
+    icon: "comment",
+  },
+] as const;
+---
+
+<section class="rise-sheet schritte" slot="sheet" id="so-gehts" aria-labelledby="schritte-title" data-nav-dark>
+  <div class="schritte__content">
+    <h2 class="schritte__title" id="schritte-title">In drei Schritten dabei.</h2>
+
+    <ol class="schritte__grid">
+      {
+        steps.map((step) => (
+          <li class="schritt">
+            <div class="schritt__top">
+              <span class="schritt__icon" aria-hidden="true">
+                {step.icon === "read" && (
+                  <svg viewBox="0 0 48 48" focusable="false">
+                    <path d="M24 13c-4-3-10-4-16-3v24c6-1 12 0 16 3 4-3 10-4 16-3V10c-6-1-12 0-16 3Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" />
+                    <path d="M24 13v24" stroke="currentColor" stroke-width="2.6" />
+                    <path d="M13 17.5c2.6-.4 5 0 7 1M13 23c2.6-.4 5 0 7 1M28 18.5c2-1 4.4-1.4 7-1M28 24c2-1 4.4-1.4 7-1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                  </svg>
+                )}
+                {step.icon === "vote" && (
+                  <svg viewBox="0 0 48 48" focusable="false">
+                    <!-- Skala „gar nicht“ bis „voll“: fünf Felder, eines gewählt, Zeiger klickt -->
+                    <rect x="3" y="13" width="7.4" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="2.2" />
+                    <rect x="12.2" y="13" width="7.4" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="2.2" />
+                    <rect x="21.4" y="13" width="7.4" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="2.2" />
+                    <rect x="30.6" y="13" width="7.4" height="9" rx="2.2" fill="currentColor" stroke="currentColor" stroke-width="2.2" />
+                    <rect x="39.8" y="13" width="7.4" height="9" rx="2.2" fill="none" stroke="currentColor" stroke-width="2.2" />
+                    <path d="M33 26.5v13.5l3.6-3.4 2.6 5.6 2.9-1.3-2.6-5.5 5-.4Z" fill="var(--icon-bg)" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+                  </svg>
+                )}
+                {step.icon === "comment" && (
+                  <svg viewBox="0 0 48 48" focusable="false">
+                    <path d="M8 11h22a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H17l-6 5v-5H8a3 3 0 0 1-3-3V14a3 3 0 0 1 3-3Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" />
+                    <path d="M37 19h3a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3h-2v5l-6-5H24a3 3 0 0 1-3-3v-1" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" />
+                    <path d="M11 18h16M11 23h10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+                  </svg>
+                )}
+              </span>
+              <span class="schritt__nr" aria-hidden="true">{step.nr}</span>
+            </div>
+            <h3 class="schritt__title">
+              <span class="visually-hidden">Schritt {step.nr}: </span>
+              {step.title}
+            </h3>
+            <p class="schritt__text">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .schritte {
+    --sheet-bg: #5a3e32;
+    --sheet-fg: var(--beige);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .schritte__content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    /* unten bündig: freier Raum liegt oben unter der Nav, „Gut zu wissen“ folgt direkt */
+    justify-content: flex-end;
+    padding: clamp(6.5rem, 22vh, 11rem) var(--gutter) clamp(2.5rem, 6vh, 3.5rem);
+  }
+
+  .schritte__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+    text-wrap: balance;
+  }
+
+  .schritte__grid {
+    display: grid;
+    gap: clamp(0.85rem, 1.6vw, 1.25rem);
+    margin: clamp(1.75rem, 5vh, 3rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .schritt {
+    --icon-bg: #f0e2d2;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.25rem, 2.4vw, 2rem);
+    border-radius: clamp(1.4rem, 2.4vw, 2rem);
+    background: var(--beige);
+    color: #3d2a21;
+  }
+
+  .schritt__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .schritt__icon {
+    display: grid;
+    place-items: center;
+    width: clamp(3.75rem, 5.5vw, 4.75rem);
+    aspect-ratio: 1;
+    border-radius: 1.1rem;
+    background: var(--icon-bg);
+    color: #5a3e32;
+  }
+
+  .schritt__icon svg {
+    width: 64%;
+    height: 64%;
+  }
+
+  .schritt__nr {
+    color: rgb(90 62 50 / 0.35);
+    font-size: clamp(2.4rem, 4vw, 3.5rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+  }
+
+  .schritt__title {
+    margin: clamp(1.5rem, 4vh, 2.25rem) 0 0;
+    color: #3d2a21;
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .schritt__text {
+    margin: 0.65rem 0 0;
+    color: rgb(61 42 33 / 0.85);
+    font-size: clamp(0.975rem, 1.15vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 841px) {
+    .schritte__content {
+      padding-top: calc(var(--about-nav) + clamp(1.5rem, 6vh, 4rem));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .schritte__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .schritt {
+        animation: schritt-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 5% entry 55%;
+      }
+    }
+  }
+
+  @keyframes schritt-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.5rem, 0);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .schritt {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

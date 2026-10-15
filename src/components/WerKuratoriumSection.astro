@@ -1,0 +1,219 @@
+---
+// Kuratorium: 17 Fachleute. Bis die Karikaturen da sind, steht ein Initialen-Avatar (reines CSS).
+const people = [
+  { name: "Stephan Allner", org: "Die Wohnkompanie Berlin" },
+  { name: "Dr. Matthias Blessing", org: "HK Rechtsanwälte" },
+  { name: "Jochen Brückmann", org: "VDGN" },
+  { name: "Sven Carstensen", org: "bulwiengesa AG" },
+  { name: "Martin Germer", org: "Pfarrer a. D., Kaiser-Wilhelm-Gedächtniskirche" },
+  { name: "Tim Heide", org: "Deutscher Werkbund Berlin" },
+  { name: "Stefan Jäckel", org: "ST raum a, Landschaftsarchitekt" },
+  { name: "Michael Knoll", org: "VBKI" },
+  { name: "Gottfried Kupsch", org: "AG City e. V." },
+  { name: "Prof. Christoph Langhof", org: "Langhof – Studio für Architektur und Design" },
+  { name: "Tim Renner", org: "Motor Music Records" },
+  { name: "Prof. Dr. Wolfgang Schäche", org: "Büro für Architektur und Stadtforschung" },
+  { name: "Benedikt Scholler", org: "pom+ Deutschland" },
+  { name: "Oliver Schruoffeneger", org: "Bezirksstadtrat Charlottenburg-Wilmersdorf" },
+  { name: "Andreas Schulten", org: "bulwiengesa AG" },
+  { name: "Dr. Sebastian Seelig", org: "BuroHappold Engineering Cities" },
+  { name: "Alyssa Weskamp", org: "Siemens AG" },
+] as const;
+
+const tones = ["yellow", "green", "blue", "purple", "coral"] as const;
+
+// Initialen ohne Titel: „Prof. Dr. Wolfgang Schäche“ → „WS“
+const initials = (name: string) => {
+  const parts = name.split(" ").filter((p) => !/^(Dr\.|Prof\.)$/.test(p));
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+---
+
+<section class="kura" id="kuratorium" aria-labelledby="kura-title">
+  <div class="kura__head">
+    <h2 class="kura__title" id="kura-title">Das Kuratorium.</h2>
+    <p class="kura__lead">
+      Ein Kreis von Fachleuten aus Städtebau, Architektur, Recht, Handel, Wohnungswirtschaft, Kultur und Mobilität. Sie
+      begleiten das Forum ehrenamtlich und schreiben die Charta 2040 weiter.
+    </p>
+    <p class="kura__note">
+      <strong>Wichtig:</strong> Sie sprechen als Personen, nicht für ihre Firmen oder Institutionen.
+    </p>
+  </div>
+
+  <ul class="kura__grid">
+    {
+      people.map((person, i) => (
+        <li class:list={["kura__card", `kura__card--${tones[i % tones.length]}`]}>
+          <span class="kura__avatar" aria-hidden="true">
+            {initials(person.name)}
+          </span>
+          <span class="kura__body">
+            <h3 class="kura__name">{person.name}</h3>
+            <p class="kura__org">{person.org}</p>
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .kura {
+    position: relative;
+    padding-inline: var(--gutter);
+    background: var(--beige);
+    color: var(--green);
+    scroll-margin-top: 4rem;
+  }
+
+  .kura__head {
+    max-width: 46rem;
+  }
+
+  .kura__title {
+    margin: 0;
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  .kura__lead {
+    max-width: 40rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+  }
+
+  .kura__note {
+    display: inline-block;
+    margin: 1rem 0 0;
+    padding: 0.65rem 0.95rem;
+    border-radius: 0.85rem;
+    background: var(--sheet);
+    color: #0f5c42;
+    font-size: clamp(0.95rem, 1.15vw, 1.075rem);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .kura__note strong {
+    font-weight: 800;
+  }
+
+  .kura__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.6rem, 1.2vw, 1rem);
+    margin: clamp(1.75rem, 5vh, 2.75rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kura__card {
+    --tone: var(--yellow);
+    --tone-fg: var(--green);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: clamp(0.9rem, 1.6vw, 1.35rem);
+    border-radius: clamp(1.1rem, 1.8vw, 1.5rem);
+    background: #ede8db;
+  }
+
+  .kura__card--green {
+    --tone: var(--sheet);
+    --tone-fg: #0f5c42;
+  }
+
+  .kura__card--blue {
+    --tone: #7dc1ea;
+    --tone-fg: #0d3550;
+  }
+
+  .kura__card--purple {
+    --tone: var(--logo-purple);
+    --tone-fg: var(--beige);
+  }
+
+  .kura__card--coral {
+    --tone: #ef856f;
+    --tone-fg: #3b120a;
+  }
+
+  /* Platzhalter-Avatar für die Karikatur: Initialen auf Farbscheibe */
+  .kura__avatar {
+    display: grid;
+    place-items: center;
+    width: clamp(3.25rem, 6vw, 4.5rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--tone);
+    color: var(--tone-fg);
+    font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .kura__body {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .kura__name {
+    margin: 0;
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .kura__org {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(0.8125rem, 0.95vw, 0.9375rem);
+    font-weight: 500;
+    line-height: 1.35;
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 760px) {
+    .kura__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .kura__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .kura__card {
+        animation: kura-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+      }
+    }
+  }
+
+  @keyframes kura-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1rem, 0);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .kura__card {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>

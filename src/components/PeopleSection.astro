@@ -1,22 +1,14 @@
 ---
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
-const charDir = join(process.cwd(), "public/characters");
-
-const svgOf = (file: string) => {
-  const raw = readFileSync(join(charDir, file), "utf-8");
-  return raw.replace(/<svg\b([^>]*)>/, (_match, attrs: string) => {
-    const clean = attrs.replace(/\s(?:width|height)="[^"]*"/g, "");
-    return `<svg${clean} aria-hidden="true" focusable="false">`;
-  });
-};
+import { Image } from "astro:assets";
+// Vorgerastert (scripts/prepare-hero-figures.ts): als Bitmap günstiger zu zeichnen als die SVG
+import finanziererin from "../assets/hero/finanziererin.webp";
 
 const facts = [
   { kicker: "seit", value: "2019", suffix: "", label: "" },
   { kicker: "", value: "65", suffix: "+", label: "Mitglieder" },
   { kicker: "", value: "4", suffix: "", label: "Meetings im Jahr" },
   { kicker: "", value: "100", suffix: " %", label: "ehrenamtlich" },
+  { kicker: "", value: "2023", suffix: "", label: "auf der Biennale in Venedig" },
 ];
 
 const stops = [
@@ -24,6 +16,7 @@ const stops = [
   { name: "Nachbar", file: "student.svg", fact: facts[1], disc: "#7cc1ea" },
   { name: "Investor", file: "NACHHALTIG.svg", fact: facts[2], disc: "#8e5aa6", heavy: true },
   { name: "Stadtplanerin", file: "kulturfreigeist.svg", fact: facts[3], disc: "#5aaf72", heavy: true },
+  { name: "Finanziererin", image: finanziererin, fact: facts[4], disc: "#9fd0ee" },
 ];
 ---
 
@@ -42,7 +35,7 @@ const stops = [
       Ein ziemlich voller <span class="people__mark">Tisch</span>.
     </h2>
     <p class="people__sub">
-      Nachbarn, Architektinnen, Händler, ein Pfarrer, Leute aus Politik und Verwaltung. Und hoffentlich bald du.
+      Nachbarn, Architektinnen, Händler, ein Pfarrer, Leute aus Politik und Verwaltung. Und online: du.
     </p>
   </header>
 
@@ -58,7 +51,29 @@ const stops = [
             <div class="stop__orb">
               <div class="stop__pop">
                 <div class="stop__disc" data-stop-disc></div>
-                <div class="stop__figure" set:html={svgOf(stop.file)} />
+                <div class="stop__figure">
+                  {"image" in stop && stop.image ? (
+                    <Image
+                      class="stop__char"
+                      src={stop.image}
+                      alt=""
+                      widths={[360, 540, 720]}
+                      sizes="(min-width: 640px) 23rem, 52vw"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <img
+                      class="stop__char"
+                      src={`/characters/${stop.file}`}
+                      alt=""
+                      width="120"
+                      height="120"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                </div>
               </div>
             </div>
             <p class="stop__fact">
@@ -234,12 +249,13 @@ const stops = [
     pointer-events: none;
   }
 
-  .stop__figure :global(svg) {
+  .stop__char {
     display: block;
     width: auto;
     height: 136%;
     max-width: 148%;
     overflow: visible;
+    object-fit: contain;
   }
 
   .stop__fact {

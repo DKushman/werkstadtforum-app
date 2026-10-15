@@ -1,0 +1,633 @@
+---
+import { themen } from "../data/charta-ziele";
+
+interface Props {
+  pdfHref: string;
+}
+const { pdfHref } = Astro.props;
+const total = themen.reduce((sum, t) => sum + t.ziele.length, 0);
+---
+
+<section class="ziele" id="ziele" aria-labelledby="ziele-title">
+  <header class="ziele__head">
+    <h2 class="ziele__title" id="ziele-title">Alle {total} Ziele.</h2>
+    <p class="ziele__lead">Sortiert in sechs Themen. Such dir aus, was dich interessiert.</p>
+  </header>
+
+  <div class="ziele__layout" data-ziele>
+    <!-- Desktop: linke Spalte, sticky. Mobil: Chip-Leiste, klebt oben. -->
+    <nav class="ziele__nav" aria-label="Themen der Charta">
+      <p class="ziele__nav-label">Themen</p>
+      <ol class="ziele__nav-list" data-ziele-nav>
+        {
+          themen.map((thema) => (
+            <li>
+              <a class:list={["ziele__nav-link", `tone--${thema.tone}`]} href={`#${thema.id}`} data-target={thema.id}>
+                <span class="ziele__nav-dot" aria-hidden="true" />
+                <span class="ziele__nav-name">{thema.nav}</span>
+                <span class="ziele__nav-count">
+                  <span class="visually-hidden">, </span>
+                  {thema.ziele.length}
+                  <span class="visually-hidden"> Ziele</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <a class="ziele__nav-pdf" href={pdfHref} download>
+        Charta als PDF
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 2.5v8.2M4.8 7.4 8 10.7l3.2-3.3M3.5 13.5h9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </nav>
+
+    <div class="ziele__topics">
+      {
+        themen.map((thema, ti) => (
+          <section class:list={["thema", `tone--${thema.tone}`]} id={thema.id} aria-labelledby={`${thema.id}-title`} data-thema>
+            <div class="thema__head">
+              <div class="thema__intro">
+                <p class="thema__count">
+                  Thema {String(ti + 1).padStart(2, "0")} · {thema.ziele.length} Ziele
+                </p>
+                <h2 class="thema__title" id={`${thema.id}-title`}>
+                  {thema.title}
+                </h2>
+                <p class="thema__sub">{thema.sub}</p>
+                <p class="thema__text">{thema.intro}</p>
+              </div>
+              <p class="thema__kpi">
+                <strong class="thema__kpi-value">{thema.kpi.value}</strong>
+                <span class="thema__kpi-text">{thema.kpi.text}</span>
+              </p>
+            </div>
+
+            <ol class="thema__list">
+              {thema.ziele.map((ziel) => (
+                <li class="ziel" id={`ziel-${ziel.n}`}>
+                  <article class="ziel__card" aria-labelledby={`ziel-${ziel.n}-title`}>
+                    <p class="ziel__num" aria-hidden="true">
+                      {ziel.n}
+                    </p>
+                    <h3 class="ziel__title" id={`ziel-${ziel.n}-title`}>
+                      <span class="visually-hidden">Ziel {ziel.n}: </span>
+                      {ziel.title}
+                    </h3>
+                    <p class="ziel__text">{ziel.text}</p>
+                  </article>
+                </li>
+              ))}
+            </ol>
+
+            <a class="thema__forum" href={thema.forum}>
+              Darüber diskutieren
+              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M3.5 8h8.2M8.8 4.8 12.2 8l-3.4 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .ziele {
+    --nav-h: calc(4.6rem + env(safe-area-inset-top, 0px));
+    --chips-h: 3.6rem;
+    --round: clamp(1.5rem, 3.2vw, 2.75rem);
+    position: relative;
+    z-index: 4; /* über der hochfahrenden Fläche (z 3) */
+    margin-top: calc(var(--round) * -1);
+    padding-inline: var(--gutter);
+    border-radius: var(--round) var(--round) 0 0;
+    scroll-margin-top: var(--nav-h);
+    background: var(--beige);
+    color: var(--green);
+  }
+
+  /* Themenfarben: Hintergrund + Vordergrund für Kennzahl, Nummern und Punkte */
+  .tone--blue {
+    --tone: #7dc1ea;
+    --tone-fg: #0d3550;
+  }
+
+  .tone--green {
+    --tone: var(--sheet);
+    --tone-fg: #0f5c42;
+  }
+
+  .tone--yellow {
+    --tone: var(--yellow);
+    --tone-fg: var(--green);
+  }
+
+  .tone--purple {
+    --tone: var(--logo-purple);
+    --tone-fg: var(--beige);
+  }
+
+  .tone--coral {
+    --tone: #ef856f;
+    --tone-fg: #3b120a;
+  }
+
+  .tone--dark {
+    --tone: var(--green);
+    --tone-fg: var(--forum-text);
+  }
+
+  /* ——— Kopf ——— */
+  .ziele__head {
+    max-width: 44rem;
+  }
+
+  .ziele__title {
+    margin: 0;
+    font-size: clamp(2.4rem, 10vw, 4.5rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  .ziele__lead {
+    margin: 0.85rem 0 0;
+    max-width: 30rem;
+    color: var(--text);
+    font-size: clamp(1rem, 1.4vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+  }
+
+  /* Einblenden beim Reinscrollen: reines CSS (scroll-driven, Compositor), ohne Script.
+     Browser ohne Unterstützung zeigen den Inhalt sofort. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .ziele__head > * {
+        animation: ziele-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 70%;
+      }
+    }
+  }
+
+  @keyframes ziele-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.25rem, 0);
+    }
+  }
+
+  /* ——— Layout ——— */
+  .ziele__layout {
+    display: grid;
+    /* minmax(0, 1fr): die breite Chip-Leiste darf die Spalte nicht aufweiten */
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  /* ——— Navigation: mobil als klebende Chip-Leiste ——— */
+  .ziele__nav {
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 5;
+    min-width: 0;
+    margin-inline: calc(var(--gutter) * -1);
+    background: transparent;
+    pointer-events: none; /* nur die Chips selbst sind klickbar */
+  }
+
+  .ziele__nav-label,
+  .ziele__nav-count,
+  .ziele__nav-pdf {
+    display: none;
+  }
+
+  .ziele__nav-list {
+    display: flex;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0.55rem var(--gutter);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--gutter), #000 calc(100% - var(--gutter)), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 var(--gutter), #000 calc(100% - var(--gutter)), transparent);
+  }
+
+  .ziele__nav-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ziele__nav-list li {
+    flex: none;
+    pointer-events: auto;
+  }
+
+  .ziele__nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1rem;
+    border-radius: 999px;
+    /* Leiste ist transparent: Chips brauchen eine eigene Fläche, um über Inhalt lesbar zu bleiben */
+    background: var(--beige);
+    box-shadow: inset 0 0 0 1.5px rgb(27 74 20 / 0.22);
+    color: var(--green);
+    font-size: 0.9375rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.25s var(--ease-out),
+      color 0.25s var(--ease-out);
+  }
+
+  .ziele__nav-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    flex: none;
+    border-radius: 50%;
+    background: var(--tone);
+    box-shadow: inset 0 0 0 1px rgb(27 74 20 / 0.2);
+  }
+
+  .ziele__nav-link.is-active {
+    background: var(--green);
+    box-shadow: none;
+    color: var(--beige);
+  }
+
+  .ziele__nav-link:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  /* ——— Themen ——— */
+  .ziele__topics {
+    display: grid;
+    gap: clamp(3.5rem, 10vh, 6rem);
+    min-width: 0;
+    padding-top: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  .thema {
+    scroll-margin-top: calc(var(--nav-h) + var(--chips-h) + 0.75rem);
+  }
+
+  .thema__head {
+    display: grid;
+    gap: clamp(1.25rem, 3vh, 1.75rem);
+  }
+
+  .thema__count {
+    margin: 0 0 0.65rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .thema__title {
+    margin: 0;
+    font-size: clamp(2rem, 7.5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .thema__sub {
+    margin: 0.55rem 0 0;
+    font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  .thema__text {
+    max-width: 38rem;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(0.975rem, 1.1vw, 1.0625rem);
+    font-weight: 500;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+  }
+
+  .thema__kpi {
+    position: relative;
+    display: grid;
+    align-content: end;
+    gap: 0.5rem;
+    margin: 0;
+    padding: clamp(1.25rem, 2.2vw, 1.75rem);
+    overflow: hidden;
+    border-radius: clamp(1.25rem, 2.2vw, 1.75rem);
+    background: var(--tone);
+    color: var(--tone-fg);
+    container-type: inline-size;
+  }
+
+  .thema__kpi::before {
+    content: "";
+    position: absolute;
+    top: -45%;
+    right: -25%;
+    width: 70%;
+    aspect-ratio: 1;
+    border: clamp(1.25rem, 7cqi, 2.25rem) solid currentColor;
+    border-radius: 50%;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  .thema__kpi-value {
+    position: relative;
+    font-size: clamp(2.6rem, 9vw, 4rem);
+    font-size: clamp(2.4rem, 17cqi, 4.5rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+  }
+
+  .thema__kpi-text {
+    position: relative;
+    max-width: 22rem;
+    font-size: clamp(0.975rem, 1.15vw, 1.1rem);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+
+  /* ——— Ziel-Karten ——— */
+  .thema__list {
+    display: grid;
+    gap: clamp(0.75rem, 1.4vw, 1rem);
+    margin: clamp(1.5rem, 4vh, 2.25rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ziel {
+    scroll-margin-top: calc(var(--nav-h) + var(--chips-h) + 0.75rem);
+  }
+
+  .ziel__card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(0.9rem, 1.6vw, 1.25rem);
+    height: 100%;
+    padding: clamp(1.1rem, 1.8vw, 1.5rem);
+    border-radius: clamp(1.1rem, 1.8vw, 1.5rem);
+    background: #ede8db;
+    color: var(--text);
+  }
+
+  /* Direktlink auf ein Ziel (#ziel-14): Karte markieren */
+  .ziel:target .ziel__card {
+    box-shadow: inset 0 0 0 3px var(--green);
+  }
+
+  .ziel__num {
+    grid-row: 1 / span 2;
+    display: grid;
+    place-items: center;
+    width: clamp(3.1rem, 4.2vw, 3.6rem);
+    height: clamp(3.1rem, 4.2vw, 3.6rem);
+    margin: 0;
+    border-radius: 0.85rem;
+    background: var(--tone);
+    color: var(--tone-fg);
+    font-size: clamp(1.45rem, 2vw, 1.75rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.05em;
+  }
+
+  .ziel__title {
+    margin: 0.1rem 0 0;
+    color: var(--green);
+    font-size: clamp(1.15rem, 1.45vw, 1.35rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .ziel__text {
+    margin: 0.45rem 0 0;
+    font-size: clamp(0.9375rem, 1vw, 1rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  .thema__forum {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    margin-top: clamp(1rem, 2.4vh, 1.5rem);
+    color: var(--green);
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  .thema__forum svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: transform 0.35s var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ziele__nav-link:not(.is-active):hover {
+      background: #ece6d6;
+    }
+
+    .thema__forum:hover svg {
+      transform: translate3d(0.25rem, 0, 0);
+    }
+
+  }
+
+  @media (min-width: 641px) {
+    .ziele {
+      --nav-h: calc(clamp(0.65rem, 1.5vw, 1rem) * 2 + clamp(2.5rem, 3.4vw, 3.5rem) + 0.25rem);
+    }
+  }
+
+  @media (min-width: 720px) {
+    .thema__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .thema__head {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+      column-gap: clamp(1.5rem, 3vw, 3rem);
+      align-items: end;
+    }
+
+    .thema__kpi {
+      min-height: 13rem;
+    }
+  }
+
+  /* ——— Desktop: linke Spalte, sticky ——— */
+  @media (min-width: 1100px) {
+    .ziele {
+      --chips-h: 0rem;
+    }
+
+    .ziele__layout {
+      grid-template-columns: minmax(14rem, 17rem) minmax(0, 1fr);
+      column-gap: clamp(2.5rem, 4vw, 4.5rem);
+      align-items: start;
+    }
+
+    .ziele__nav {
+      top: calc(var(--nav-h) + 1.25rem);
+      margin: 0;
+      padding-top: clamp(1.5rem, 4vh, 2.5rem);
+      background: none;
+      pointer-events: auto;
+    }
+
+    .ziele__nav-label {
+      display: block;
+      margin: 0 0 0.75rem;
+      color: var(--muted);
+      font-size: 0.8125rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .ziele__nav-list {
+      display: grid;
+      gap: 0.2rem;
+      padding: 0;
+      overflow: visible;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .ziele__nav-link {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      width: 100%;
+      padding: 0 0.85rem;
+      border-radius: 0.75rem;
+      background: none;
+      box-shadow: none;
+      font-size: 0.975rem;
+      white-space: normal;
+    }
+
+    .ziele__nav-count {
+      display: block;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.6;
+    }
+
+    .ziele__nav-link.is-active .ziele__nav-count {
+      opacity: 0.85;
+    }
+
+    .ziele__nav-pdf {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-height: 44px;
+      margin-top: 1rem;
+      padding: 0 0.85rem;
+      color: var(--green);
+      font-size: 0.875rem;
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 0.2em;
+    }
+
+    .ziele__nav-pdf svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ziele__head > *,
+    .ziele__nav-link,
+    .thema__forum svg {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .ziel__card,
+    .thema__kpi,
+    .ziele__nav-link {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>
+
+<script>
+  /* Aktives Thema in der Navigation markieren (IntersectionObserver, nur Klassen). */
+  const root = document.querySelector<HTMLElement>("[data-ziele]");
+  if (root) {
+    const list = root.querySelector<HTMLElement>("[data-ziele-nav]");
+    const links = [...root.querySelectorAll<HTMLAnchorElement>("[data-target]")];
+    const sections = [...root.querySelectorAll<HTMLElement>("[data-thema]")];
+    const byId = new Map(links.map((link) => [link.dataset.target, link]));
+    let current = "";
+
+    const activate = (id: string) => {
+      if (id === current) return;
+      current = id;
+      for (const link of links) {
+        const on = link.dataset.target === id;
+        link.classList.toggle("is-active", on);
+        if (on) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      }
+      // Chip-Leiste (mobil) horizontal mitführen, ohne die Seite zu bewegen
+      const link = byId.get(id);
+      if (list && link && list.scrollWidth > list.clientWidth) {
+        const left = link.offsetLeft - (list.clientWidth - link.offsetWidth) / 2;
+        list.scrollTo({ left, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      }
+    };
+
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = (entry.target as HTMLElement).id;
+          if (entry.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        }
+        // oberstes sichtbares Thema in der Lesezone gewinnt
+        const first = sections.find((s) => visible.has(s.id));
+        if (first) activate(first.id);
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 },
+    );
+    for (const section of sections) observer.observe(section);
+  }
+</script>

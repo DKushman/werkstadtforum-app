@@ -1,0 +1,818 @@
+---
+import { Image } from "astro:assets";
+import breitscheidplatz from "../assets/orte/breitscheidplatz.jpg";
+import hardenbergplatz from "../assets/orte/hardenbergplatz.jpg";
+import kudamm from "../assets/orte/kudamm.jpg";
+import messeIcc from "../assets/orte/messe-icc.jpg";
+
+type Fact = { value: string; text: string };
+
+type Place = {
+  id: string;
+  title: string;
+  teaser: string;
+  sub: string;
+  here: string;
+  planned: string[];
+  facts?: Fact[];
+  progress?: string;
+  note?: string;
+  cta: string;
+  chartaLink?: boolean;
+  img: ImageMetadata;
+  alt: string;
+};
+
+const places: Place[] = [
+  {
+    id: "ort-breitscheidplatz",
+    title: "Breitscheidplatz",
+    teaser: "Das Herz der City West soll wieder ein Ort zum Bleiben werden.",
+    sub: "Das Herz der City West.",
+    here: "Der Platz an der Gedächtniskirche, wo Ku’damm, Tauentzienstraße und Budapester Straße aufeinandertreffen. Viele laufen nur durch. Kaum jemand bleibt.",
+    planned: [
+      "Die Charta macht den Breitscheidplatz zum Mittelpunkt der City West.",
+      "Drei neue Projekte sollen rund um den Platz entstehen, mit Wohnungen und Kultur, damit hier auch abends Leben ist.",
+      "Die Gedächtniskirche soll wieder im Mittelpunkt stehen.",
+    ],
+    progress:
+      "Es gibt einen ersten Entwurf, einen Rahmenplan. Er soll die Grundlage für einen Bebauungsplan sein.",
+    note: "Bebauungsplan = Plan, der rechtlich festlegt, was wo gebaut werden darf.",
+    cta: "Hochhäuser am Breitscheidplatz: Wie hoch ist zu hoch?",
+    chartaLink: true,
+    img: breitscheidplatz,
+    alt: "Kaiser-Wilhelm-Gedächtniskirche am Breitscheidplatz zwischen Hochhäusern",
+  },
+  {
+    id: "ort-hardenbergplatz",
+    title: "Hardenbergplatz",
+    teaser: "Vom Busparkplatz zum Eingangstor der City West.",
+    sub: "Das Eingangstor zur City West.",
+    here: "Der Platz vor dem Bahnhof Zoo, heute vor allem Busse, Taxis und Durchgangsverkehr. Für viele der erste Eindruck der City West.",
+    planned: [
+      "Der Platz wird umgebaut zum Entrée der City West.",
+      "Hier soll ein zentraler Umschlagplatz für Waren und Verkehr entstehen.",
+      "Lieferungen werden unter der Erde verteilt statt mit Lkw durch die Straßen.",
+    ],
+    cta: "Was soll man sehen, wenn man am Zoo aus dem Bahnhof kommt?",
+    img: hardenbergplatz,
+    alt: "Kreuzung am Hardenbergplatz mit Zoo Palast und Bikini Berlin von oben",
+  },
+  {
+    id: "ort-kudamm",
+    title: "Ku’damm und Kantstraße",
+    teaser: "Weniger Autos, mehr Busse, mehr Platz für alle.",
+    sub: "Die Lebensadern der City West.",
+    here: "Die bekanntesten Straßen der City West: Läden, Kinos, Theater, Cafés. Und sehr viel Verkehr.",
+    planned: [],
+    facts: [
+      { value: "alle 3 Minuten", text: "soll werktags tagsüber ein Bus auf Ku’damm und Kantstraße fahren." },
+      {
+        value: "40 %",
+        text: "weniger Autoverkehr in der City West. Dafür schlägt die Charta eine Gebühr für Autos vor, die in die City West fahren (City-Maut).",
+      },
+      { value: "1 Kulturmeile", text: "Die Theater, Kinos und Galerien am Ku’damm sollen gestärkt und ergänzt werden." },
+    ],
+    cta: "Ku’damm ohne Autos: Traum oder Albtraum?",
+    img: kudamm,
+    alt: "Straßenszene am Europa-Center mit Verkehr und Passanten",
+  },
+  {
+    id: "ort-messe-icc",
+    title: "Messe / ICC",
+    teaser: "Ein neues Stück Stadt für Forschung und Wohnen.",
+    sub: "Ein neues Stück Stadt.",
+    here: "Das Messegelände und das ICC, das große silberne Kongresszentrum, das seit Jahren leer steht.",
+    planned: [
+      "Ein neuer Standort für Wissenschaft und Forschung.",
+      "Ein neuer Stadtteil mit Wohnungen.",
+      "Ein Umschlagplatz für Waren, der die Innenstadt vom Lieferverkehr entlastet.",
+    ],
+    cta: "Was soll aus dem ICC werden?",
+    img: messeIcc,
+    alt: "Funkturm und Messehallen vor der Berliner Skyline",
+  },
+];
+---
+
+<section class="rise-sheet orte" slot="sheet" id="orte" aria-labelledby="orte-title">
+  <div class="orte__content">
+    <div class="orte__head">
+      <h2 class="orte__title" id="orte-title">Vier Orte. Viel vor.</h2>
+      <p class="orte__lead">An diesen Orten entscheidet sich, wie die City West in Zukunft aussieht.</p>
+    </div>
+
+    <!-- Übersicht: Standort-Pins, große H3 als Anker zu den Karten -->
+    <ol class="orte__index" aria-label="Orte">
+      {
+        places.map((place, index) => (
+          <li class="orte__index-item" style={`--i: ${index}`}>
+            <a class="orte__index-link" href={`#${place.id}`}>
+              <svg class="orte__pin" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 22s7-6.6 7-12.2A7 7 0 0 0 5 9.8C5 15.4 12 22 12 22Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="9.8" r="2.4" fill="currentColor" />
+              </svg>
+              <span class="orte__index-text">
+                <h3 class="orte__index-title">{place.title}</h3>
+                <span class="orte__index-sub">{place.teaser}</span>
+              </span>
+              <span class="orte__index-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- Detailkarten: Bild als Fläche, unten abgedunkelt, Panel fährt beim Öffnen hoch.
+         Desktop: Sticky-Stapel. Mobil: Wisch-Slider mit Scroll-Snap. -->
+    <ol class="orte__stack" data-orte-stack>
+      {
+        places.map((place, index) => (
+          <li class="orte__card" id={place.id} style={`--i: ${index}`}>
+            <article class="orte__card-in" aria-labelledby={`${place.id}-title`}>
+              <Image
+                src={place.img}
+                alt={place.alt}
+                width={1600}
+                height={1000}
+                widths={[640, 960, 1280, 1600]}
+                sizes="(min-width: 900px) 92vw, 86vw"
+                loading="lazy"
+                decoding="async"
+                class="orte__img"
+              />
+              <span class="orte__num" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <div class="orte__panel" data-panel>
+                <div class="orte__panel-head" data-panel-head>
+                  <div class="orte__panel-title">
+                    <p class="orte__sub">{place.sub}</p>
+                    <h3 class="orte__card-title" id={`${place.id}-title`}>
+                      {place.title}
+                    </h3>
+                  </div>
+                  <button
+                    class="orte__toggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls={`${place.id}-body`}
+                    aria-label={`Details zu ${place.title}`}
+                    data-panel-toggle
+                  >
+                    <svg class="orte__toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="orte__panel-body" id={`${place.id}-body`} data-panel-body data-lenis-prevent>
+                  <div class="orte__cols">
+                    <dl class="orte__facts">
+                      <dt>Was ist hier?</dt>
+                      <dd>{place.here}</dd>
+
+                      <dt>Was ist geplant?</dt>
+                      <dd>
+                        {place.facts ? (
+                          <ul class="orte__numbers">
+                            {place.facts.map((fact) => (
+                              <li>
+                                <strong class="orte__value">{fact.value}</strong>
+                                <span>{fact.text}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <ul class="orte__list">
+                            {place.planned.map((item) => (
+                              <li>{item}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </dd>
+                    </dl>
+
+                    <div class="orte__side">
+                      <dl class="orte__facts">
+                        <dt>Wie weit ist es?</dt>
+                        <dd>
+                          {place.progress ? <p>{place.progress}</p> : null}
+                          {place.note ? <p class="orte__note">{place.note}</p> : null}
+                          <span class="orte__placeholder">[Aktueller Stand]</span>
+                        </dd>
+
+                        <dt>Projekte vor Ort</dt>
+                        <dd>
+                          <span class="orte__placeholder">[Platzhalter]</span>
+                        </dd>
+                      </dl>
+
+                      <div class="orte__actions">
+                        <a class="cta orte__cta" href={`/forum?ort=${place.id.replace("ort-", "")}`}>
+                          <span class="orte__cta-label">Mitreden:</span> {place.cta}
+                        </a>
+                        {place.chartaLink ? (
+                          <a class="orte__textlink" href="/charta">
+                            Das sagt die Charta
+                          </a>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .orte {
+    --sheet-bg: #8f5aa6;
+    --sheet-fg: var(--beige);
+    --stack-top: calc(4.75rem + env(safe-area-inset-top, 0px));
+    --stack-step: 1.1rem;
+  }
+
+  .orte__content {
+    padding: clamp(6.5rem, 22vh, 11rem) var(--gutter) clamp(3rem, 8vh, 5rem);
+  }
+
+  .orte__head {
+    max-width: 40rem;
+  }
+
+  .orte__title {
+    margin: 0;
+    font-size: clamp(2.2rem, 9vw, 3.4rem);
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .orte__lead {
+    max-width: 34rem;
+    margin: 0.85rem 0 0;
+    color: rgb(245 241 228 / 0.86);
+    font-size: clamp(0.95rem, 2.6vw, 1.125rem);
+    font-weight: 500;
+    line-height: 1.38;
+    letter-spacing: -0.012em;
+  }
+
+  /* ——— Übersicht ——— */
+  .orte__index {
+    margin: clamp(1.75rem, 5vh, 3rem) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid rgb(245 241 228 / 0.28);
+  }
+
+  .orte__index-item {
+    border-bottom: 1px solid rgb(245 241 228 / 0.28);
+  }
+
+  .orte__index-link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: clamp(0.85rem, 2.4vw, 1.5rem);
+    padding: clamp(1rem, 3vh, 1.6rem) 0;
+    color: var(--beige);
+    text-decoration: none;
+  }
+
+  .orte__index-link:focus-visible {
+    outline: 2px solid var(--beige);
+    outline-offset: 4px;
+    border-radius: 0.35rem;
+  }
+
+  .orte__pin {
+    width: clamp(1.6rem, 4vw, 2.2rem);
+    height: clamp(1.6rem, 4vw, 2.2rem);
+    flex: none;
+    transition: transform 0.4s var(--ease-bounce);
+  }
+
+  .orte__index-text {
+    display: block;
+    min-width: 0;
+  }
+
+  .orte__index-title {
+    margin: 0;
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .orte__index-sub {
+    display: block;
+    margin-top: 0.35rem;
+    color: rgb(245 241 228 / 0.78);
+    font-size: clamp(0.9rem, 2.3vw, 1rem);
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .orte__index-arrow {
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1;
+    opacity: 0.6;
+    transition:
+      transform 0.4s var(--ease-out),
+      opacity 0.3s var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .orte__index-link:hover .orte__index-arrow {
+      opacity: 1;
+      transform: translate3d(0.35rem, 0, 0);
+    }
+
+    .orte__index-link:hover .orte__pin {
+      transform: translate3d(0, -0.15rem, 0) scale(1.08);
+    }
+  }
+
+  /* ——— Detailkarten ——— */
+  .orte__stack {
+    --card-h: min(70svh, 32rem);
+    --head-h: 10rem;
+    display: flex;
+    gap: clamp(0.85rem, 3vw, 1.25rem);
+    margin: clamp(2.5rem, 8vh, 4.5rem) calc(var(--gutter) * -1) 0;
+    padding: 0 var(--gutter);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .orte__stack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .orte__card {
+    flex: 0 0 min(86vw, 26rem);
+    height: var(--card-h);
+    scroll-snap-align: start;
+    scroll-margin-top: calc(var(--stack-top) + 0.5rem);
+  }
+
+  /* Karte: Bild als Fläche, Ecken rund, alles darin geclippt (contain: paint hält Repaints lokal) */
+  .orte__card-in {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: clamp(1.5rem, 3vw, 2.25rem);
+    background: #3c2a44;
+    color: var(--beige);
+    contain: paint;
+    isolation: isolate;
+  }
+
+  .orte__img {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Dauerhafte Abdunklung unten, damit Name und Button lesbar sind */
+  .orte__card-in::after {
+    content: "";
+    position: absolute;
+    inset: 40% 0 0;
+    z-index: 1;
+    background: linear-gradient(to bottom, rgb(11 7 8 / 0) 0%, rgb(11 7 8 / 0.72) 100%);
+    pointer-events: none;
+  }
+
+  .orte__num {
+    position: absolute;
+    top: clamp(0.85rem, 2vw, 1.25rem);
+    left: clamp(0.85rem, 2vw, 1.25rem);
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    min-width: 2.6rem;
+    height: 2.6rem;
+    padding-inline: 0.55rem;
+    border-radius: 0.55rem;
+    background: var(--beige);
+    color: var(--green);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  /* offen: Nummer ausblenden, damit sie auf kleinen Karten nicht mit dem Panel-Kopf kollidiert */
+  .orte__num {
+    transition: opacity 0.3s var(--ease-out);
+  }
+
+  .orte__card.is-open .orte__num {
+    opacity: 0;
+  }
+
+  /* Panel: sitzt unten, zu = nur der Kopf ist sichtbar (Rest unter der Kartenkante),
+     offen = fährt per transform hoch. Der eigene Verlauf vergrößert den dunklen Bereich. */
+  .orte__panel {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    padding-top: clamp(2.5rem, 6vh, 4rem);
+    background: linear-gradient(to bottom, rgb(11 7 8 / 0) 0%, rgb(11 7 8 / 0.8) clamp(2.5rem, 6vh, 4rem), rgb(11 7 8 / 0.9) 100%);
+    transform: translate3d(0, calc(100% - var(--head-h)), 0);
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .orte__card.is-open .orte__panel {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .orte__panel-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    column-gap: clamp(0.75rem, 1.6vw, 1.1rem);
+    padding: 0 clamp(1.1rem, 2.4vw, 2rem) clamp(1.1rem, 2.4vw, 1.75rem);
+  }
+
+  .orte__panel-title {
+    min-width: 0;
+  }
+
+  .orte__sub {
+    margin: 0 0 0.4rem;
+    color: var(--sheet);
+    font-size: clamp(0.75rem, 1vw, 0.875rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .orte__card-title {
+    margin: 0;
+    font-size: clamp(1.75rem, 7vw, 2.6rem);
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .orte__toggle {
+    order: -1;
+    display: grid;
+    margin-bottom: 0.2rem;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1.5px solid rgb(245 241 228 / 0.5);
+    border-radius: 50%;
+    background: rgb(245 241 228 / 0.1);
+    color: var(--beige);
+    cursor: pointer;
+    transition:
+      background-color 0.25s var(--ease-out),
+      border-color 0.25s var(--ease-out);
+  }
+
+  .orte__toggle:focus-visible {
+    outline: 2px solid var(--beige);
+    outline-offset: 3px;
+  }
+
+  .orte__toggle-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: transform 0.45s var(--ease-out);
+  }
+
+  .orte__card.is-open .orte__toggle {
+    border-color: var(--beige);
+    background: var(--beige);
+    color: var(--ink);
+  }
+
+  .orte__card.is-open .orte__toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .orte__toggle:hover {
+      border-color: var(--beige);
+      background: rgb(245 241 228 / 0.22);
+    }
+  }
+
+  /* Inhalte: blenden nach dem Hochfahren ein; bei zu wenig Höhe intern scrollbar */
+  .orte__panel-body {
+    min-height: 0;
+    padding: 0 clamp(1.1rem, 2.4vw, 2rem) clamp(1.1rem, 2.6vw, 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    /* unten leicht ausblenden, damit sichtbar ist, dass es weitergeht */
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 2rem), transparent);
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out);
+  }
+
+  .orte__card.is-open .orte__panel-body {
+    opacity: 1;
+    transition: opacity 0.4s var(--ease-out) 0.2s;
+  }
+
+  .orte__cols {
+    display: grid;
+    gap: clamp(1rem, 2.4vh, 1.5rem);
+  }
+
+  .orte__facts {
+    display: grid;
+    gap: 0.35rem 0;
+    margin: 0;
+  }
+
+  .orte__facts dt {
+    margin: 0;
+    padding-top: 0.75rem;
+    color: var(--sheet);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .orte__facts dt:first-child {
+    padding-top: 0;
+  }
+
+  .orte__facts dd {
+    margin: 0;
+    max-width: 34rem;
+    color: rgb(245 241 228 / 0.92);
+    font-size: clamp(0.9rem, 1vw, 1rem);
+    font-weight: 500;
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+  }
+
+  .orte__facts dd p {
+    margin: 0;
+  }
+
+  .orte__facts dd p + p {
+    margin-top: 0.35rem;
+  }
+
+  .orte__list {
+    display: grid;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .orte__list li {
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .orte__list li::before {
+    content: "";
+    position: absolute;
+    top: 0.55em;
+    left: 0;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 0.12rem;
+    background: var(--sheet);
+  }
+
+  .orte__numbers {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .orte__numbers li {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .orte__value {
+    color: var(--beige);
+    font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .orte__note {
+    color: rgb(245 241 228 / 0.7);
+    font-size: 0.9em;
+  }
+
+  .orte__placeholder {
+    display: inline-block;
+    margin-top: 0.4rem;
+    padding: 0.18rem 0.5rem;
+    border: 1.5px dashed rgb(245 241 228 / 0.45);
+    border-radius: 0.45rem;
+    color: rgb(245 241 228 / 0.75);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .orte__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-top: clamp(1rem, 2.4vh, 1.5rem);
+  }
+
+  .orte__cta {
+    --cta-bg: var(--beige);
+    --cta-fg: var(--green);
+    --cta-hover-bg: #fff;
+    --cta-hover-fg: var(--green);
+    height: auto;
+    min-height: 44px;
+    padding-block: 0.6rem;
+    text-align: left;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .orte__cta-label {
+    margin-right: 0.3em;
+    opacity: 0.7;
+  }
+
+  .orte__textlink {
+    color: var(--beige);
+    font-size: clamp(0.9rem, 1vw, 0.95rem);
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+  }
+
+  .orte__textlink:hover,
+  .orte__textlink:focus-visible {
+    color: var(--sheet);
+  }
+
+  @media (min-width: 841px) {
+    .orte__content {
+      padding-top: calc(var(--about-nav) + clamp(1.5rem, 5vh, 3rem));
+    }
+  }
+
+  @media (min-width: 900px) {
+    .orte {
+      --stack-top: calc(clamp(0.65rem, 1.5vw, 1rem) * 2 + clamp(2.5rem, 3.4vw, 3.5rem) + 0.75rem);
+    }
+
+    .orte__title {
+      font-size: clamp(2.6rem, 4.6vw, 4.25rem);
+    }
+
+    .orte__index-title {
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+    }
+
+    /* Desktop: untereinander statt Slider */
+    .orte__stack {
+      --card-h: min(78svh, 46rem);
+      display: grid;
+      gap: clamp(1rem, 3vh, 1.75rem);
+      margin-inline: 0;
+      padding: 0;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+    .orte__card {
+      flex: none;
+    }
+
+    .orte__card-title {
+      font-size: clamp(2.4rem, 3.6vw, 3.8rem);
+    }
+
+    .orte__cols {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      column-gap: clamp(1.5rem, 4vw, 3.5rem);
+      align-items: start;
+    }
+  }
+
+  /* Sticky-Stapel nur, wenn eine Karte samt Kante in den Viewport passt */
+  @media (min-width: 900px) and (min-height: 820px) {
+    .orte__card {
+      position: sticky;
+      top: calc(var(--stack-top) + var(--i) * var(--stack-step));
+    }
+
+    .orte__stack::after {
+      content: "";
+      height: clamp(3rem, 8vh, 5rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orte__pin,
+    .orte__index-arrow,
+    .orte__panel,
+    .orte__toggle,
+    .orte__toggle-icon,
+    .orte__panel-body {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .orte__card-in,
+    .orte__placeholder,
+    .orte__toggle {
+      border: 1px solid CanvasText;
+    }
+  }
+</style>
+
+<script>
+  /* Panel-Kopfhöhe je Karte messen (--head-h) und Dropdown schalten.
+     Läuft nur bei Laden, Schriftladen, Resize und Klick – nichts pro Frame. */
+  const stack = document.querySelector<HTMLElement>("[data-orte-stack]");
+  if (stack) {
+    const cards = [...stack.querySelectorAll<HTMLElement>(".orte__card")];
+
+    const measure = () => {
+      for (const card of cards) {
+        const head = card.querySelector<HTMLElement>("[data-panel-head]");
+        // sichtbarer Teil im zugeklappten Zustand: Panel-Oberkante bis Unterkante des Kopfs
+        if (head) card.style.setProperty("--head-h", `${Math.ceil(head.offsetTop + head.offsetHeight)}px`);
+      }
+    };
+
+    const setOpen = (card: HTMLElement, open: boolean) => {
+      card.classList.toggle("is-open", open);
+      card.querySelector("[data-panel-toggle]")?.setAttribute("aria-expanded", open ? "true" : "false");
+      const body = card.querySelector<HTMLElement>("[data-panel-body]");
+      if (body) {
+        body.inert = !open;
+        if (!open) body.scrollTop = 0;
+      }
+    };
+
+    for (const card of cards) {
+      setOpen(card, false);
+      card.querySelector("[data-panel-toggle]")?.addEventListener("click", () => {
+        setOpen(card, !card.classList.contains("is-open"));
+      });
+    }
+
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(measure);
+    };
+    measure();
+    document.fonts?.ready.then(schedule);
+    addEventListener("resize", schedule, { passive: true });
+  }
+</script>

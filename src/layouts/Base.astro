@@ -4,31 +4,76 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description: string;
+  /** Kein Lenis – besser für lange Sticky-Layouts (z. B. /worum-gehts). */
+  nativeScroll?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, nativeScroll = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang="de" data-native-scroll={nativeScroll ? "" : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#F5F1E4" media="(prefers-color-scheme: light)" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="WerkStadtForum" />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
 
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:url" content={canonical} />
+
     <link rel="preload" href="/fonts/work-sans-800.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Seitenwechsel „neue Seite kommt von oben“: Browser mit Cross-Document View Transitions
+         machen das per CSS (global.css). Für alle anderen (z. B. Firefox) setzt dieses Mini-Script
+         vor dem ersten Paint eine Klasse, wenn die Navigation von einem internen Link kam. -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        try {
+          if (!("CSSViewTransitionRule" in window) && sessionStorage.getItem("wsf-nav") === "1") {
+            d.classList.add("vt-enter");
+            setTimeout(function () { d.classList.remove("vt-enter"); }, 900);
+          }
+          sessionStorage.removeItem("wsf-nav");
+        } catch (e) {}
+        document.addEventListener("click", function (e) {
+          var a = e.target.closest && e.target.closest("a[href]");
+          if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          if (a.target === "_blank" || a.hasAttribute("download") || a.origin !== location.origin) return;
+          if (a.pathname === location.pathname) return; // Anker auf derselben Seite
+          try { sessionStorage.setItem("wsf-nav", "1"); } catch (err) {}
+        });
+      })();
+    </script>
+    <!-- Interne Seiten bei Hover vorladen (Speculation Rules, ohne JS-Bundle; Browser ohne
+         Unterstützung ignorieren das). Prefetch statt Prerender: Das HTML liegt beim Klick schon
+         im Cache, gerendert wird aber erst dann – so laufen die Hero-Intros sichtbar ab. -->
+    <script is:inline type="speculationrules">
+      {
+        "prefetch": [
+          {
+            "where": { "and": [{ "href_matches": "/*" }, { "not": { "href_matches": "/*\\?*" } }] },
+            "eagerness": "moderate"
+          }
+        ]
+      }
+    </script>
+    <slot name="head" />
   </head>
   <body>
     <slot />

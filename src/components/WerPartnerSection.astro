@@ -1,0 +1,222 @@
+---
+import PillLink from "./PillLink.astro";
+
+// 20 Platzhalter, bis die Partnerlogos da sind: Farbkreis + Name. Drei Reihen, laufen endlos
+// (reines CSS, nur transform), Richtung abwechselnd. Hover hält die Reihe an und hebt den Chip.
+const colors = ["#e9cb6f", "#b3e79b", "#7dc1ea", "#8e5aa6", "#ef856f", "#3a7a30", "#f3e2a8", "#d9573f", "#9fd0ee", "#5aaf72"];
+const partners = Array.from({ length: 20 }, (_, i) => ({
+  name: `Partner ${String(i + 1).padStart(2, "0")}`,
+  color: colors[i % colors.length],
+}));
+const rows = [partners.slice(0, 7), partners.slice(7, 14), partners.slice(14)];
+---
+
+<section class="partner" id="partner" aria-labelledby="partner-title">
+  <h2 class="partner__title" id="partner-title">Mit Unterstützung von</h2>
+
+  <!-- Logo-Zeilen: sichtbare Liste einmal, die Kopie für die Endlosschleife ist aria-hidden -->
+  <div class="partner__rows" data-partner-rows>
+    {
+      rows.map((row, r) => (
+        <div class:list={["partner__row", r % 2 === 1 && "partner__row--rev"]} style={`--dur: ${44 + r * 8}s`}>
+          <div class="partner__track">
+            {[0, 1].map((copy) => (
+              <ul class="partner__set" aria-hidden={copy === 1 ? "true" : undefined}>
+                {row.map((p) => (
+                  <li class="partner__chip">
+                    <span class="partner__logo" style={`--c: ${p.color}`} />
+                    <span class="partner__name">{p.name}</span>
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="partner__cta">
+    <p class="partner__text">
+      Du vertrittst ein Unternehmen oder eine Institution und willst die City West mitgestalten?
+    </p>
+    <PillLink href="/partner-werden" label="Partner werden" />
+  </div>
+
+  <!-- Startpunkt der Brückenlinie: unsichtbarer Streifen an der Unterkante. Die Linie hat die
+       Farbe der Section und wächst so direkt aus ihr heraus in die Mitmachen-Section. -->
+  <span class="partner__origin" data-bridge-disc aria-hidden="true"></span>
+</section>
+
+<style>
+  /* Kein z-index auf der Section: die Brückenlinie (z 1) malt über ihren Grund,
+     der CTA-Block (z 3) liegt über der Linie */
+  .partner {
+    --round: clamp(1.5rem, 3.2vw, 2.75rem);
+    position: relative;
+    padding-inline: 0;
+    border-radius: var(--round);
+    background: var(--sheet);
+    color: var(--green);
+    scroll-margin-top: 4rem;
+  }
+
+  .partner__title {
+    margin: 0;
+    padding-inline: var(--gutter);
+    font-size: clamp(2.3rem, 9.5vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
+  }
+
+  /* ——— Laufende Reihen ——— */
+  .partner__rows {
+    display: grid;
+    gap: 0;
+    margin-top: clamp(1.75rem, 5vh, 3rem);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  /* Puffer oben/unten, damit angehobene Pills beim Hover nicht abgeschnitten werden */
+  .partner__row {
+    overflow: hidden;
+    padding-block: clamp(0.4rem, 0.7vw, 0.6rem);
+  }
+
+  .partner__track {
+    display: flex;
+    width: max-content;
+    animation: partner-run var(--dur) linear infinite;
+  }
+
+  .partner__row--rev .partner__track {
+    animation-direction: reverse;
+  }
+
+  .partner__row:hover .partner__track,
+  .partner__rows.is-off .partner__track {
+    animation-play-state: paused;
+  }
+
+  @keyframes partner-run {
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .partner__set {
+    display: flex;
+    gap: clamp(0.6rem, 1.2vw, 1rem);
+    margin: 0;
+    padding: 0 clamp(0.3rem, 0.6vw, 0.5rem);
+    list-style: none;
+  }
+
+  .partner__chip {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 1.4vw, 1.25rem);
+    padding: clamp(0.55rem, 1vw, 0.85rem) clamp(1.5rem, 2.6vw, 2.5rem) clamp(0.55rem, 1vw, 0.85rem)
+      clamp(0.55rem, 1vw, 0.85rem);
+    border-radius: 999px;
+    background: var(--beige);
+    color: var(--green);
+    transition: transform 0.45s var(--ease-bounce);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .partner__chip:hover {
+      transform: translate3d(0, -0.3rem, 0) scale(1.04);
+    }
+
+    .partner__chip:hover .partner__logo {
+      transform: rotate(-12deg) scale(1.08);
+    }
+  }
+
+  /* Platzhalter-Logo: weißer Kreis mit farbigem Punkt */
+  .partner__logo {
+    position: relative;
+    flex: none;
+    width: clamp(2.6rem, 4.2vw, 3.75rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.45s var(--ease-bounce);
+  }
+
+  .partner__logo::after {
+    content: "";
+    position: absolute;
+    inset: 26%;
+    border-radius: 50%;
+    background: var(--c);
+  }
+
+  .partner__name {
+    font-size: clamp(1rem, 1.5vw, 1.35rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  /* ——— CTA (Ursprung der Linie) ——— */
+  .partner__cta {
+    display: grid;
+    justify-items: start;
+    gap: 1.1rem;
+    max-width: 40rem;
+    margin: clamp(2.5rem, 7vh, 4rem) 0 0;
+    padding: 0 var(--gutter) clamp(2.5rem, 7vh, 4rem);
+  }
+
+  /* Breite bestimmt die Strichstärke (62 %), Mitte die Austrittsstelle */
+  .partner__origin {
+    position: absolute;
+    bottom: 0;
+    right: calc(var(--gutter) + var(--round));
+    width: min(24rem, 40%);
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .partner__text {
+    margin: 0;
+    font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner__track {
+      animation: none;
+    }
+
+    .partner__row {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .partner__set[aria-hidden="true"] {
+      display: none;
+    }
+
+    .partner__chip,
+    .partner__logo {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  /* Endlos-Reihen pausieren, solange die Section nicht sichtbar ist */
+  const rows = document.querySelector<HTMLElement>("[data-partner-rows]");
+  if (rows) {
+    new IntersectionObserver(([e]) => rows.classList.toggle("is-off", !e.isIntersecting)).observe(rows);
+  }
+</script>

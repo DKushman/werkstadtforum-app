@@ -1,0 +1,478 @@
+---
+/**
+ * Seiten-Hero (Layout wie „Worum geht's?“): Headline links, Figur rechts.
+ * Mit Slot „sheet“ klebt der Hero oben (sticky) und die Fläche (.rise-sheet, beliebig hoch)
+ * schiebt sich beim Scrollen darüber; --p (0–1, aus scripts/smooth-scroll.ts über #about-pin)
+ * verkleinert dabei Headline und Figur.
+ */
+import { Image } from "astro:assets";
+
+interface Props {
+  /** Headline-Zeilen, jede Zeile fährt per line-rise hoch */
+  title: string[];
+  /** optionale Unterzeile direkt unter der H1 */
+  sub?: string;
+  lead: string;
+  /** Vorgerasterte Figur (scripts/prepare-hero-figures.ts) – als Bitmap günstig zu rastern */
+  image?: ImageMetadata;
+  /** Alternativ: mehrere Figuren nebeneinander (leicht überlappend) */
+  group?: ImageMetadata[];
+  /** Figur horizontal spiegeln, damit sie zum Text schaut */
+  flip?: boolean;
+  /** breite Figur (Seitenverhältnis > 0,6): größer setzen und rechts anschneiden wie die schmalen */
+  wide?: boolean;
+}
+
+const { title, sub, lead, image, group, flip = false, wide = false } = Astro.props;
+const hasActions = Astro.slots.has("actions");
+// Gruppe: Breite = Summe der Figuren minus Überlappung (je 25 % einer Figur), Höhe = höchste
+const width = group ? group.reduce((s, g) => s + g.width, 0) - (group.length - 1) * group[0].width * 0.25 : image!.width;
+const height = group ? Math.max(...group.map((g) => g.height)) : image!.height;
+const pinned = Astro.slots.has("sheet");
+---
+
+<div
+  class:list={["about-pin", pinned && "about-pin--pinned", hasActions && "about-pin--actions", wide && "about-pin--wide", group && "about-pin--group"]}
+  id={pinned ? "about-pin" : undefined}
+  style={`--fig-w: ${width}; --fig-h: ${height}; --flip: ${flip ? -1 : 1}`}
+>
+  <div class="about-hero">
+    <div class="about-hero__stage">
+      <div class="about-hero__copy">
+        <h1 class="about-hero__title" id="about-title">
+          {
+            title.map((line, i) => (
+              <span class="line-rise" style={i ? `--rise-delay: ${(i * 0.08).toFixed(2)}s` : undefined}>
+                <span>{line}</span>
+              </span>
+            ))
+          }
+        </h1>
+        {
+          sub ? (
+            <p class="about-hero__sub">
+              <span class="about-hero__lead-in" style="--in-delay: 0.12s">{sub}</span>
+            </p>
+          ) : null
+        }
+        <p class="about-hero__lead">
+          <span class="about-hero__lead-in" style={sub ? "--in-delay: 0.24s" : undefined}>{lead}</span>
+        </p>
+        {
+          hasActions ? (
+            <div class="about-hero__actions">
+              <div class="about-hero__actions-in">
+                <slot name="actions" />
+              </div>
+            </div>
+          ) : null
+        }
+      </div>
+      <div class="about-hero__figure">
+        <div class="about-hero__figure-in">
+          {
+            group ? (
+              group.map((g, i) => (
+                <Image
+                  class="about-hero__member"
+                  src={g}
+                  alt=""
+                  widths={[360, 560, 900]}
+                  sizes="(min-width: 841px) 22vw, 40vw"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority={i === 1 ? "high" : "auto"}
+                  style={`--w: ${((g.width / width) * 100).toFixed(2)}%; --ol: ${i ? ((g.width * 0.25) / width * 100).toFixed(2) : 0}%; --z: ${i + 1}; --n: ${i}`}
+                />
+              ))
+            ) : (
+              <Image
+                class="about-hero__investor"
+                src={image!}
+                alt=""
+                widths={[560, 900, 1400]}
+                sizes="(min-width: 841px) 44vw, 90vw"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+              />
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <slot name="sheet" />
+</div>
+
+<style>
+  .about-pin {
+    --p: 0;
+    --about-nav: calc(clamp(4rem, 11vw, 4.75rem) + max(0.35rem, env(safe-area-inset-top, 0px)));
+    position: relative;
+    background: var(--beige);
+  }
+
+  .about-hero {
+    position: relative;
+    z-index: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    background: var(--beige);
+  }
+
+  .about-pin--pinned .about-hero {
+    position: sticky;
+    top: 0;
+  }
+
+  /* Solange skaliert wird (p < 1), liegt der Text auf einer eigenen Ebene (nur komponiert,
+     nicht neu gerastert). Die Figur bleibt dauerhaft auf ihrer Ebene: beim Auflösen der
+     Sticky-Ebene würde Safari das große Bild sonst synchron neu malen (ca. 160 ms Ruckler). */
+  .about-pin--pinned.is-live .about-hero__copy {
+    will-change: transform;
+  }
+
+  .about-pin--pinned .about-hero__figure {
+    will-change: transform;
+  }
+
+  /* Allgemeine hochfahrende Fläche: liegt im Fluss hinter dem Hero, schiebt sich beim
+     Scrollen über den klebenden Hero. Farbe über --sheet-bg / --sheet-fg. */
+  .about-pin :global(.rise-sheet) {
+    position: relative;
+    z-index: 3;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-block: 0;
+    border-radius: clamp(1.5rem, 3.2vw, 2.75rem) clamp(1.5rem, 3.2vw, 2.75rem) 0 0;
+    background: var(--sheet-bg, var(--yellow));
+    color: var(--sheet-fg, var(--green));
+  }
+
+  .about-hero__stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    padding: var(--about-nav) var(--gutter) clamp(0.75rem, 2.5vh, 1.25rem);
+  }
+
+  .about-hero__copy {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .about-hero__title {
+    margin: 0;
+    color: var(--green);
+    font-size: clamp(2.65rem, 11.5vw, 3.55rem);
+    font-weight: 800;
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+  }
+
+  .about-hero__lead {
+    margin: 0;
+    padding-top: clamp(1.15rem, 3.2vh, 1.75rem);
+    overflow: hidden;
+    color: var(--green);
+    font-size: clamp(0.8125rem, 0.76rem + 0.28vw, 0.9375rem);
+    font-weight: 500;
+    line-height: 1.34;
+    letter-spacing: -0.011em;
+  }
+
+  .about-hero__sub {
+    margin: 0;
+    padding-top: clamp(0.7rem, 2vh, 1.1rem);
+    overflow: hidden;
+    color: var(--green);
+    font-size: clamp(1.15rem, 4.6vw, 1.45rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .about-hero__sub + .about-hero__lead {
+    padding-top: clamp(0.6rem, 1.6vh, 0.9rem);
+  }
+
+  /* Maske wie bei den Headline-Zeilen: Buttons steigen nach dem Text von unten auf.
+     Polster in der Maske, damit Fokusrahmen nicht abgeschnitten werden. */
+  .about-hero__actions {
+    --mask-pad: 0.4rem;
+    margin: calc(clamp(1.1rem, 3vh, 1.6rem) - var(--mask-pad)) calc(var(--mask-pad) * -1) calc(var(--mask-pad) * -1);
+    padding: var(--mask-pad);
+    overflow: hidden;
+  }
+
+  .about-hero__actions-in {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.4rem;
+    animation: about-actions-in 0.9s var(--ease-out) 0.55s both;
+  }
+
+  @keyframes about-actions-in {
+    from {
+      transform: translate3d(0, calc(100% + var(--mask-pad) * 2), 0);
+    }
+  }
+
+  .about-hero__lead-in {
+    display: block;
+    animation: about-lead-in 0.9s var(--ease-out) var(--in-delay, 0.16s) both;
+  }
+
+  @keyframes about-lead-in {
+    from {
+      transform: translateY(110%);
+    }
+  }
+
+  .about-hero__figure {
+    position: absolute;
+    z-index: 1;
+    right: -18%;
+    bottom: 0;
+    width: 90%;
+    height: auto;
+    aspect-ratio: var(--fig-w) / var(--fig-h);
+    margin: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 840px) {
+    .about-hero__stage {
+      padding-bottom: 0;
+    }
+
+    .about-hero__copy {
+      flex: 0 0 auto;
+      justify-content: flex-start;
+      padding-top: clamp(2.25rem, 8vh, 3.75rem);
+    }
+
+    .about-hero__lead {
+      padding-top: clamp(0.7rem, 1.8vh, 1rem);
+    }
+
+    .about-hero__figure {
+      bottom: -9%;
+    }
+
+    /* mit Buttons: Figur an Höhe gekoppelt, damit sie den Text nicht überdeckt */
+    .about-pin--actions .about-hero__figure {
+      right: -12%;
+      width: min(80%, 48svh);
+      bottom: -6%;
+    }
+
+    .about-pin--wide .about-hero__figure {
+      right: -24%;
+      width: min(100%, 50svh);
+      bottom: -10%;
+    }
+
+    .about-pin--group .about-hero__figure {
+      right: -30%;
+      width: min(146%, 84svh);
+      bottom: -9%;
+    }
+  }
+
+  .about-hero__figure-in {
+    width: 100%;
+    height: 100%;
+    transform: scaleX(var(--flip));
+    animation: about-figure-in 0.85s var(--ease-out) 0.12s both;
+  }
+
+  .about-hero__investor {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Gruppe: Figuren unten bündig nebeneinander, leicht überlappend, mittlere vorn */
+  .about-pin--group .about-hero__figure-in {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  /* Jede Figur gespiegelt (schaut nach links); sie schieben sich nacheinander von rechts herein */
+  .about-hero__member {
+    position: relative;
+    z-index: var(--z);
+    display: block;
+    flex: none;
+    width: var(--w);
+    height: auto;
+    margin-left: calc(var(--ol) * -1);
+    transform: scaleX(-1);
+    animation: member-in 0.9s var(--ease-out) both;
+    animation-delay: calc(0.15s + var(--n) * 0.14s);
+  }
+
+  @keyframes member-in {
+    from {
+      opacity: 0;
+      transform: scaleX(-1) translate3d(-35%, 0, 0);
+    }
+  }
+
+  @keyframes about-figure-in {
+    from {
+      opacity: 0;
+      transform: scaleX(var(--flip)) translateY(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(var(--flip));
+    }
+  }
+
+  @media (min-width: 841px) {
+    .about-pin {
+      --about-nav: calc(clamp(0.65rem, 1.5vw, 1rem) * 2 + clamp(2.5rem, 3.4vw, 3.5rem));
+    }
+
+    .about-hero__stage {
+      height: 100%;
+      min-height: 0;
+      padding: 0 var(--gutter);
+      overflow: visible;
+    }
+
+    .about-hero__copy {
+      /* wie Mockup: Headline + Absatz gemeinsam ~52 %, Absatz ~4–5 Zeilen */
+      box-sizing: border-box;
+      transform: translate(calc(var(--p) * 10vw), calc(var(--p) * 1vh))
+        scale(calc(1 - var(--p) * 0.24));
+      transform-origin: center center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100svh;
+      font-size: clamp(2.95rem, 6.15vw, 5.65rem);
+      width: min(9.15em, 52%);
+      padding-block: calc(var(--about-nav) + clamp(0.5rem, 2svh, 1rem))
+        clamp(1rem, 4svh, 2.5rem);
+    }
+
+    .about-hero__title {
+      font-size: 1em;
+    }
+
+    .about-hero__lead {
+      padding-top: 0.68em;
+      font-size: max(0.875rem, 0.28em);
+      line-height: 1.32;
+    }
+
+    .about-hero__sub {
+      padding-top: 0.4em;
+      font-size: max(1.15rem, 0.4em);
+    }
+
+    .about-hero__sub + .about-hero__lead {
+      padding-top: 0.45em;
+    }
+
+    .about-hero__actions {
+      margin-top: calc(0.55em - var(--mask-pad));
+      font-size: 1rem;
+    }
+
+    .about-hero__figure {
+      position: absolute;
+      z-index: 1;
+      top: 6.5svh;
+      right: -3.2vw;
+      bottom: auto;
+      width: min(70svh, 44vw);
+      max-width: none;
+      height: auto;
+      margin: 0;
+      transform: translate(calc(var(--p) * -16vw), calc(var(--p) * 8vh))
+        scale(calc(1 - var(--p) * 0.42));
+      transform-origin: center center;
+    }
+  }
+
+  @media (min-width: 841px) {
+    .about-pin--wide .about-hero__figure {
+      top: 5svh;
+      right: -9vw;
+      width: min(88svh, 54vw);
+    }
+
+    .about-pin--group .about-hero__figure {
+      top: auto;
+      bottom: -6svh;
+      right: -10vw;
+      width: min(108svh, 58vw);
+    }
+  }
+
+  @media (min-width: 841px) and (max-height: 760px) {
+    .about-hero__copy {
+      padding-block: calc(var(--about-nav) + 0.25rem) clamp(0.75rem, 3svh, 1.5rem);
+    }
+
+    .about-hero__figure {
+      top: 4svh;
+      width: min(64svh, 40vw);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-pin--pinned .about-hero {
+      position: relative;
+    }
+
+    .about-hero__figure {
+      transform: none;
+    }
+
+    .about-hero__figure-in,
+    .about-hero__member {
+      animation: none;
+    }
+
+    .about-hero__copy {
+      transform: none;
+    }
+
+    .about-hero__lead-in,
+    .about-hero__actions-in {
+      animation: none;
+      transform: none;
+    }
+
+    .about-hero__stage {
+      overflow: visible;
+    }
+
+    .about-hero {
+      position: relative;
+      height: auto;
+      overflow: visible;
+    }
+  }
+</style>

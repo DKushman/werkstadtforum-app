@@ -1,0 +1,54 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import AboutHero from "../components/AboutHero.astro";
+import MachenSection from "../components/MachenSection.astro";
+import ChartaEntstehungSection from "../components/ChartaEntstehungSection.astro";
+import RegelnSection from "../components/RegelnSection.astro";
+import OrganisiertSection from "../components/OrganisiertSection.astro";
+import KurzGefragtSection from "../components/KurzGefragtSection.astro";
+import MitmachenSection from "../components/MitmachenSection.astro";
+import ForumBridgeLine from "../components/ForumBridgeLine.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+const title = "Worum geht's hier eigentlich? – WerkStadtForum";
+const description =
+  "Das WerkStadtForum ist ein offenes Forum für die Berliner City West. Hier diskutieren Nachbarn, Fachleute, Wirtschaft und Politik gemeinsam.";
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Worum geht's hier eigentlich?",
+  description,
+  url: canonical.href,
+  inLanguage: "de-DE",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "WerkStadtForum",
+    url: Astro.site?.href ?? "https://werkstadtforum.de/",
+  },
+};
+---
+
+<Base title={title} description={description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+  <Nav />
+  <div class="page-sheet">
+    <main>
+      <AboutHero />
+      <MachenSection />
+      <ChartaEntstehungSection />
+      <RegelnSection />
+      <OrganisiertSection />
+      <div class="forum-bridge" data-worum-bridge>
+        <ForumBridgeLine />
+        <KurzGefragtSection />
+        <MitmachenSection />
+      </div>
+    </main>
+  </div>
+  <SiteFooter />
+</Base>

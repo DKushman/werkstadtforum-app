@@ -1,0 +1,57 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import PageHero from "../components/PageHero.astro";
+import architektin from "../assets/hero/architektin.webp";
+import OrteSection from "../components/OrteSection.astro";
+import HinweisSection from "../components/HinweisSection.astro";
+import MitmachenSection from "../components/MitmachenSection.astro";
+import ForumBridgeLine from "../components/ForumBridgeLine.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+const title = "Was wird gebaut? – WerkStadtForum";
+const description =
+  "Manches wird schon gebaut, vieles erst diskutiert. Was an welchem Ort der City West geplant ist, wie weit es ist und wo du mitreden kannst.";
+
+const lead =
+  "Manches wird schon gebaut, vieles erst diskutiert. Hier siehst du, was an welchem Ort der City West geplant ist, wie weit es ist und wo du mitreden kannst.";
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Was wird gebaut?",
+  description,
+  url: canonical.href,
+  inLanguage: "de-DE",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "WerkStadtForum",
+    url: Astro.site?.href ?? "https://werkstadtforum.de/",
+  },
+};
+---
+
+<Base title={title} description={description}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+  <Nav />
+  <div class="page-sheet">
+    <main>
+      <PageHero
+        title={["Was wird", "gebaut?"]}
+        lead={lead}
+        image={architektin}
+      >
+        <OrteSection slot="sheet" />
+      </PageHero>
+      <div class="forum-bridge forum-bridge--rounded" data-worum-bridge data-line-start="0.5" style="--bridge-color: #b4e69a">
+        <ForumBridgeLine />
+        <HinweisSection />
+        <MitmachenSection />
+      </div>
+    </main>
+  </div>
+  <SiteFooter />
+</Base>
